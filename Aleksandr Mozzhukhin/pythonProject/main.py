@@ -11,7 +11,7 @@ char1=pygame.image.load("character.png")
 char2=pygame.image.load("character2.png")
 danger=pygame.image.load("asteroid.png")
 
-class player1(object):
+class Player1(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -25,7 +25,7 @@ class player1(object):
 
 
 
-class player2(object):
+class Player2(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -38,7 +38,7 @@ class player2(object):
         self.hitbox = (self.x + 20, self.y-7, 25, 40)
 
 
-class asteroid(object):
+class Asteroid(object):
     def __init__(self, x, y, width, height, end):
         self.x=x
         self.y=y
@@ -71,13 +71,13 @@ def redrewGameWindow():
     win.blit(texture_background, (0, 0))
     man1.draw(win)
     man2.draw(win)
-    asteroid.draw(win)
+    Asteroid.draw(win)
     pygame.display.update()
 
 #main part
-man1=player1(0, 0, 50, 45)
-man2=player2(0,450, 69,43)
-asteroid=asteroid(random.randint(0,450), 0, 50, 50, 450)
+man1=Player1(0, 0, 50, 45)
+man2=Player2(0, 450, 69, 43)
+asteroid=Asteroid(random.randint(0, 450), 0, 50, 50, 450)
 run = True
 while run:
     pygame.time.delay(100)
