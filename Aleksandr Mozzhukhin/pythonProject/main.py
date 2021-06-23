@@ -22,7 +22,6 @@ class player1(object):
     def draw(self, win):
         win.blit(char1, (self.x, self.y))
         self.hitbox = (self.x+10, self.y, 30, 50)
-        pygame.draw.rect(win, (255,0,0), self.hitbox, 2)
 
 
 
@@ -37,7 +36,6 @@ class player2(object):
     def draw(self, win):
         win.blit(char2, (self.x, self.y))
         self.hitbox = (self.x + 20, self.y-7, 25, 40)
-        pygame.draw.rect(win, (255,0,0), self.hitbox, 2)
 
 
 class asteroid(object):
@@ -54,7 +52,6 @@ class asteroid(object):
         self.move()
         win.blit(danger, (self.x, self.y))
         self.hitbox = (self.x + 10, self.y, 25, 50)
-        pygame.draw.rect(win, (255,0,0), self.hitbox, 2)
 
     def move(self):
         if self.vel>0:
