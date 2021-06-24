@@ -85,13 +85,14 @@ while run:
             bullets.pop(bullets.index(bullet))
 
     keys = pygame.key.get_pressed()
-    # if mouse[]:
-    #     if man.left:
-    #         facing = -1
-    #     else:
-    #         facing = 1
-    #     if len(bullets) < 1:
-    #         bullets.append(projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (255, 0, 0), facing))
+    if man.left:
+        facing = -1
+    else:
+        facing = 1
+    if len(bullets) < 1:
+        for i in pygame.event.get():
+            if i.type == pygame.BUTTON_RIGHT:
+                bullets.append(projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (255, 0, 0), facing))
 
     if keys[pygame.K_a] and man.x > man.vel:
         if keys[pygame.K_w]:
