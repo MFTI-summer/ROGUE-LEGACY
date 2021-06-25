@@ -162,7 +162,6 @@ class Tile(pg.sprite.Sprite):
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
     sc = pg.display.set_mode((WIN_width, WIN_height))
-    sc.fill
     generator = Level(test_map)
     generator.update(sc)
     while 1:
