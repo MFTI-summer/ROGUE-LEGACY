@@ -1,11 +1,9 @@
 import pygame
-
+# ---Ненужная фигня---
 pygame.init()
-
 win = pygame.display.set_mode((500, 480))
-
-pygame.display.set_caption("First Game")
-
+pygame.display.set_caption("Физика")
+# ---Загрузка фоток персонажа и фона---
 walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'),
              pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'),
              pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
@@ -14,23 +12,23 @@ walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.ima
             pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
 bg = pygame.image.load('bg.jpg')
 char = pygame.image.load('standing.png')
-
+# ---Задаем TPS---
 clock = pygame.time.Clock()
-
+# ---Класс гг---
 class player(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 5
+        self.vel = 5 # подвижность право-лево
+        # булы
         self.isJump = False
         self.left = False
         self.right = False
         self.walkCount = 0
         self.jumpCount = 10
         self.standing = True
-
     def draw(self, win):
         if self.walkCount + 1 >= 27:
             self.walkCount = 0
@@ -47,7 +45,7 @@ class player(object):
                 win.blit(walkRight[0], (self.x, self.y))
             else:
                 win.blit(walkLeft[0], (self.x, self.y))
-
+# ---Настройки снарядов---
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
         self.x = x
@@ -56,20 +54,17 @@ class projectile(object):
         self.color = color
         self.facing = facing
         self.vel = 12 * facing
-
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
-
+# ---Отрисовка следующего кадра---
 def redrawGameWindow():
     win.blit(bg, (0, 0))
     man.draw(win)
     for bullet in bullets:
         bullet.draw(win)
-
     pygame.display.update()
-
-# mainloop
+# ---Главный цикл---
 man = player(200, 410, 64, 64)
 bullets = []
 run = True
@@ -83,17 +78,18 @@ while run:
             bullet.x += bullet.vel
         else:
             bullets.pop(bullets.index(bullet))
-
     keys = pygame.key.get_pressed()
+    # ---Отправка пуль во врага---
     if man.left:
         facing = -1
     else:
         facing = 1
     if len(bullets) < 1:
         for i in pygame.event.get():
-            if i.type == pygame.BUTTON_RIGHT:
-                bullets.append(projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (255, 0, 0), facing))
-
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if i.button == 3:
+                    bullets.append(projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (0, 0, 0), facing))
+    # --- Управление гг---
     if keys[pygame.K_a] and man.x > man.vel:
         if keys[pygame.K_w]:
             man.x -= man.vel + 3
@@ -116,22 +112,10 @@ while run:
             man.right = True
             man.left = False
             man.standing = False
-    # elif keys[pygame.KMOD_SHIFT] and keys[pygame.K_d] and man.x < 500 - man.width - man.vel:
-    #     man.vel = 10
-    #     man.x = man.vel
-    #     man.right = True
-    #     man.left = False
-    #     man.standing = False
-    # elif keys[pygame.KMOD_SHIFT] and keys[pygame.K_a] and man.x > man.vel:
-    #     man.vel = 10
-    #     man.x = man.vel
-    #     man.right = False
-    #     man.left = True
-    #     man.standing = False
     else:
         man.standing = True
         man.walkCount = 0
-
+    # ---Прыжок---
     if not (man.isJump):
         if keys[pygame.K_SPACE]:
             man.isJump = True
