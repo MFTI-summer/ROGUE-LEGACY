@@ -45,6 +45,7 @@ class player(object):
                 win.blit(walkRight[0], (self.x, self.y))
             else:
                 win.blit(walkLeft[0], (self.x, self.y))
+
 # ---Настройки снарядов---
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
@@ -64,10 +65,17 @@ def redrawGameWindow():
     for bullet in bullets:
         bullet.draw(win)
     pygame.display.update()
+
 # ---Главный цикл---
 man = player(200, 410, 64, 64)
 bullets = []
 run = True
+
+
+def movingplayer():
+    pass
+
+
 while run:
     clock.tick(27)
     for event in pygame.event.get():
@@ -88,7 +96,9 @@ while run:
         for i in pygame.event.get():
             if i.type == pygame.MOUSEBUTTONDOWN:
                 if i.button == 3:
-                    bullets.append(projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (0, 0, 0), facing))
+                    bullets.append(
+                        projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (0, 0, 0),
+                                   facing))
     # --- Управление гг---
     if keys[pygame.K_a] and man.x > man.vel:
         if keys[pygame.K_w]:
@@ -127,7 +137,7 @@ while run:
             neg = 1
             if man.jumpCount < 0:
                 neg = -1
-            man.y -= (man.jumpCount ** 2) * 0.3 * neg
+            man.y -= (man.jumpCount ** 2) * 0.5 * neg
             man.jumpCount -= 1
         else:
             man.isJump = False
