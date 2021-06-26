@@ -21,7 +21,6 @@ from pygame.locals import*
 # Эти переменные мне нужны чисто сейчас. Далее они тебе не понядобятся
 WIN_width: int = 1000
 WIN_height: int = 700
-#Эта перменная нужна для отображения фона
 screen = pg.display.set_mode((WIN_width, WIN_height))
 # Та сама карта-пример, про которую я говорил в комментарии
 # test_map = \
@@ -263,12 +262,9 @@ class Level:  # Тот самый класс, ради которого писа
                 x += self.step  # смещаемся вправо на ширину одной плитки
             y += self.step  # спускаемся вниз
 
-        #Это - фон
+        # Это - фон
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (100, 100))
-        """
-        Тут я сделала плитки для платформ полупрозрачными.
-        """
     
     def update(self, surface):
         """
@@ -292,6 +288,7 @@ class Tile(pg.sprite.Sprite):
         image = pg.image.load(img_file_src).convert()
         self.rect = image.get_rect()
         self.image = pg.transform.rotate(image, degree)
+        self.image.set_colorkey((0, 0, 0))
         self.rect.x = x
         self.rect.y = y
         self.speed = 2
@@ -323,9 +320,9 @@ class Tile(pg.sprite.Sprite):
 
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
-    sc = pg.display.set_mode((WIN_width, WIN_height))
+    global screen
     generator = Level(level_10_map)
-    generator.update(sc)
+    generator.update(screen)
     while 1:
 
         for i in pg.event.get():
