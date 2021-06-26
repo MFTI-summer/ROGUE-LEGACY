@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.locals import*
 
 # ПРОЧИТАЙ, ВАЖНО!!! Как тут оставить документацию к пакету? А, да пофиг, просто коммент захреначу. Чтобы работать с
 # этим модулем, тебе лучше ознакомиться с исходным кодом Вот тебе кратенко обо всем, что тут происходит. Во-первых,
@@ -20,6 +21,7 @@ import pygame as pg
 # Эти переменные мне нужны чисто сейчас. Далее они тебе не понядобятся
 WIN_width: int = 1000
 WIN_height: int = 700
+screen = pg.display.set_mode((WIN_width, WIN_height))
 # Та сама карта-пример, про которую я говорил в комментарии
 # test_map = \
 #   """
@@ -37,84 +39,135 @@ WIN_height: int = 700
 # Эту карту я закомментила, потому что поменяла обозначения плиток (см.tiles_dict)
 
 level_1_map = \
-"""
-&&&&&&&&&&&&&&&
----------------
+    """
+===============
+_______________
 ...............
 ...............
 ...............
 ...............
 ...............
-..../_____%....
-____,=====`____
+..../-----%....
+----,=====`----
 ===============
 """
 level_2_map = \
-"""
-&&&&&&&&&&&&&&&
----------------
+    """
+===============
+_______________
 ...............
 ...............
 .........~~....
 .....~~.....~~.
 ..~~...........
 ...............
-_______________
+---------------
 ===============
 """
 level_3_map = \
-"""
-&&&&&&&&&&&&&&&
----------------
-...............
-...............
-~~..........~~.
+    """
+===============
+"_____________'
+|.............I
+№.............#
+............~~.
 .....~~.~~.....
-..~~...........
-...............
-_______________
+>~~...........<
+|.............I
+`-------------'
 ===============
 """
 level_4_map = \
-"""
-&&&?-------!&&&
-&&?^.......<!&&
-&?^.........<!&
--^....~~.....<-
+    """
+==="_______'===
+=="№.......#'==
+="№.........#'=
+_№....~~.....#_
 ...............
 ...~~......~~..
-_>......~~...#_
-=`>.~~......#,=
-==`>.......#,==
-===`_______,===
+->......~~...<-
+=`>.~~......<,=
+==`>.......<,==
+===`-------,===
 """
 level_5_map = \
-"""
-&&&&?-----!&&&&
-&&&&).....(&&&&
-----|.....i----
-....:.....:....
-....:.....:....
-....+..*..+....
->......:~.....#
-)......:..~~..(
-)...~~.:......(
-`______$______,
+    """
+===="_____'====
+====|.....I====
+____:.....!____
+....]...~~]....
+....].....]....
+..~.}..{..}.~..
+>......]......<
+|......].~~...I
+|...~~.]......I
+`------+------,
 """
 level_6_map = \
-"""
-&&?---!&&?--!&&
-&&)...(&&)..(&&
---^...(&&)..<--
-......<--^.....
+    """
+=="___'=="__'==
+==|...I==|..I==
+__№...I==|..#__
+......#__№.....
 ...............
-____>.......~~.
-====]...~~.....
-====]..........
-====`__________
+---->.......~~.
+====|...~~.....
+====|..........
+====`----------
 ===============
 """
-
+level_7_map = \
+"""
+____№.......I==
+............!__
+........<---;..
+......~.#___№..
+...~~..........
+--%............
+===%.........~~
+====%......~...
+====`---->.....
+=========`-----
+"""
+level_8_map = \
+"""
+=="___№...#___'
+==|...........I
+"_№...........I
+|......~~.....I
+№.............I
+...<-------->.I
+...I"_______№.I
+.<-,|.........I
+.I==|.........I
+.I==|........<,
+"""
+level_9_map = \
+"""
+"____№...#____'
+|.............I
+|.............I
+|.....~~~.....I
+|.........~~..I
+|...~~........I
+`->.........<-,
+==`->.....<-,==
+====`-----,====
+===============
+"""
+level_10_map = \
+"""
+"____№...#____'
+|.............I
+|.............I
+|....~~.......I
+$[[[[)...([[[[@
+|.............I
+|.......~.....I
+|.............I
+`---->~~~<----,
+=====|...I=====
+"""
 # Очень важно, чтобы кол-во символов в ряду совпадало (хотя генератор от этого не сломается
 # но выглядеть будет лучше. Точки обозначают пустое место, поэтому можно все дозаполнить ими
 
@@ -125,30 +178,36 @@ class Level:  # Тот самый класс, ради которого писа
     # В качестве значения подойдет любой символ, который еще не использовался и котрый можно набрать на клаве
     tiles_dict = {
         '.': None,
-        '/': ['Textures/wall_texture_side_left.png', 0],
-        '%': ['Textures/wall_texture_side_right.png', 0],
-        '=': ['Textures/wall_texture_main.png', 0],
-        '&': ['Textures/wall_texture_main.png', 180],
-        '-': ['Textures/wall_texture_main_with_border.png', 180],
-        '_': ['Textures/wall_texture_main_with_border.png', 0],
-        '(': ['Textures/wall_texture_side_2_right.png', 180],
-        ')': ['Textures/wall_texture_side_2_left.png', 0],
-        ']': ['Textures/wall_texture_side_2_left_reversed.png', 0],
-        '~': ['Textures/platform.png', 0],
-        '*': ['Textures/wall_texture_all_sides.png', 0],
-        '+': ['Textures/wall_texture_all_sides.png', 180],
-        ':': ['Textures/wall_texture_two_sides .png', 0],
-        '>': ['Textures/wall_texture_main_with_border_angle.png', 0],
-        '<': ['Textures/wall_texture_main_with_border_angle.png', 180],
-        '^': ['Textures/wall_texture_main_with_border_angle_2.png', 0],
-        '#': ['Textures/wall_texture_main_with_border_angle_2.png', 180],
-        ',': ['Textures/wall_texture_corner_left.png', 0],
-        '`': ['Textures/wall_texture_corner_right.png', 0],
-        '?': ['Textures/wall_texture_corner_left.png', 180],
-        '!': ['Textures/wall_texture_corner_right.png', 180],
-        '$': ['Textures/wall_texture_two_corners.png', 0],
-        '|': ['Textures/wall_texture_side_2_left_corner.png', 0],
-        'i': ['Textures/wall_texture_side_2_right_corner.png', 180]
+        '=': ['Textures/usual.png', 0],
+        '<': ['Textures/border_angle_up_left.png', 0],
+        '>': ['Textures/border_angle_up_right.png', 0],
+        '№': ['Textures/border_angle_down_right.png', 0],
+        '#': ['Textures/border_angle_down_left.png', 0],
+        '_': ['Textures/border_down.png', 0],
+        '-': ['Textures/border_up.png', 0],
+        '|': ['Textures/border_vertical_right.png', 0],
+        'I': ['Textures/border_vertical_left.png', 0],
+        ':': ['Textures/border_vertical_and_corner_down-left.png', 0],
+        ';': ['Textures/border_vertical_and_corner_up-left.png', 0],
+        '!': ['Textures/border_vertical_and_corner_down-right.png', 0],
+        '?': ['Textures/border_vertical_and_corner_up-right.png', 0],
+        '`': ['Textures/corner_up_right.png', 0],
+        ',': ['Textures/corner_up_left.png', 0],
+        '"': ['Textures/corner_down_right.png', 0],
+        "'": ['Textures/corner_down_left.png', 0],
+        '+': ['Textures/two_corners_up.png', 0],
+        '*': ['Textures/two_corners_down.png', 0],
+        '@': ['Textures/two_corners_left.png', 0],
+        '$': ['Textures/two_corners_right.png', 0],
+        '[': ['Textures/borders_down_and_up.png', 0],
+        ']': ['Textures/borders_left_and_right.png', 0],
+        '{': ['Textures/Three_borders_up.png', 0],
+        '}': ['Textures/Three_borders_down.png', 0],
+        ')': ['Textures/Three_borders_right.png', 0],
+        '(': ['Textures/Three_borders_left.png', 0],
+        '/': ['Textures/side_left.png', 0],
+        '%': ['Textures/side_right.png', 0],
+        '~': ['Textures/platform.png', 0]
     }
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
@@ -203,6 +262,10 @@ class Level:  # Тот самый класс, ради которого писа
                 x += self.step  # смещаемся вправо на ширину одной плитки
             y += self.step  # спускаемся вниз
 
+        # Это - фон
+        bg = pg.image.load("Textures/background_750x500.png").convert()
+        screen.blit(bg, (100, 100))
+    
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -225,6 +288,7 @@ class Tile(pg.sprite.Sprite):
         image = pg.image.load(img_file_src).convert()
         self.rect = image.get_rect()
         self.image = pg.transform.rotate(image, degree)
+        self.image.set_colorkey((0, 0, 0))
         self.rect.x = x
         self.rect.y = y
         self.speed = 2
@@ -256,9 +320,9 @@ class Tile(pg.sprite.Sprite):
 
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
-    sc = pg.display.set_mode((WIN_width, WIN_height))
-    generator = Level(level_6_map)
-    generator.update(sc)
+    global screen
+    generator = Level(level_10_map)
+    generator.update(screen)
     while 1:
 
         for i in pg.event.get():
