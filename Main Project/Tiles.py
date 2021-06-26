@@ -329,21 +329,12 @@ class Tile(pg.sprite.Sprite):
 
 # Это класс для полупрозрачных платформ. Так как на них можно запрыгнуть снизу,
 # взаимодействие г. г. с ними нужно прописать отдельно (возможно, ты уже знаешь).
-class Platform(pg.sprite.Sprite):
+class Platform(Tile):
     size = 50
     
     def __init__(self, x, y):
-        pg.sprite.Sprite.__init__(self)
-        image = pg.image.load('Textures/platform.png').convert()
-        self.rect = image.get_rect()
-        self.image = image
-        self.image.set_colorkey((0, 0, 0))# Эта строка отвечает за полупрозрачность
-        self.rect.x = x
-        self.rect.y = y
+        Tile.__init__(self, 'Textures/platform.png', 0, x, y)
         self.speed = 2
-        
-    def update(self, surface: pg.surface.Surface) -> None:
-        surface.blit(self.image, self.rect)
 
 
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
