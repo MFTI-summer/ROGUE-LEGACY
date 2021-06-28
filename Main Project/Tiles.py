@@ -213,7 +213,8 @@ class Level:  # Тот самый класс, ради которого писа
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
         self.step = Tile.size
-        self.level = None
+        self.level = pg.sprite.Group()
+        self.platforms = pg.sprite.Group()
         self.generate_level(level_map)
 
     def generate_level(self, level_map: str):
@@ -225,7 +226,7 @@ class Level:  # Тот самый класс, ради которого писа
         :return: None
         """
         # Это группа спрайтов представляет собой все тайлы, которые есть на уровне.
-        self.level = pg.sprite.Group()
+
 
         split_map = level_map.split('\n')  # Разделяем "карту" на отдельные слои
 
@@ -267,7 +268,11 @@ class Level:  # Тот самый класс, ради которого писа
                     x += self.step  # смещаемся вправо на ширину одной плитки
                 # Это добавление плиток для платформ
                 else:
-                    self.level.add(Platform(x, y))# собственно добавление
+                    platform = Platform(x, y) # так как платформа добавляется в несоколько групп, то ее нужно
+                    # занести в отдельную переменную, иначе мы будем добавлять 2 разные платформы
+                    self.level.add(platform)  # собственно добавление
+                    self.platforms.add(platform)  # Чтобы было удобнее обрабатывать физику платформ, я добавил
+                    # отдельную группу
                     x += self.step # смещение вправо
             # спускаемся вниз
             y += self.step
