@@ -102,8 +102,13 @@ class Hero(pg.sprite.Sprite):
 
                 if self.current_speed['y'] < 0:
                     platform_index = self.rect.collidelist(self.level.platforms.sprites())
+                    platform_rect = self.level.platforms.sprites()[platform_index].rect
                     floor_index = self.rect.collidelist(self.level.floor.sprites())
-                    if platform_index != -1 or floor_index != -1:
+                    floor_rect = self.level.floor.sprites()[floor_index].rect
+                    if platform_index != -1 and platform_rect.top <= self.rect.bottom < platform_rect.bottom:
+                        self.current_speed['y'] = 0
+                        self.is_jump = False
+                    if floor_index != -1 and self.rect.bottom >= floor_rect.top - 1 and self.rect.bottom < floor_rect.top + 10:
                         self.current_speed['y'] = 0
                         self.is_jump = False
 
