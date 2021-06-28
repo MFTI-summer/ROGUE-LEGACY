@@ -217,9 +217,14 @@ class Level:  # Тот самый класс, ради которого писа
     }
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
-        self.step = Tile.size
-        self.level = pg.sprite.Group()
-        self.platforms = pg.sprite.Group()
+        self.step = Tile.size  # Задаем размер шага
+        # переменные для разных типов тайлов (платформа, потолок, пол и т.д.)
+        self.level = pg.sprite.Group()  # Весь уровень
+        self.platforms = pg.sprite.Group()  # платформы
+        self.celling = pg.sprite.Group()  # потолок
+        self.walls = pg.sprite.Group()  # стены
+        self.floor = pg.sprite.Group()  # пол
+        # Генерировать уровень
         self.generate_level(level_map)
 
     def generate_level(self, level_map: str):
@@ -268,7 +273,13 @@ class Level:  # Тот самый класс, ради которого писа
                         continue
                     src = tile_properties[0]  # путь к изображению
                     degree = tile_properties[1]  # Градус будущего поворота
-                    self.level.add(Tile(src, degree, x, y))  # добавляем новую плитку к уже имеющимся
+                    tile = Tile(src, degree, x, y)
+                    self.level.add(tile)  # добавляем новую плитку к уже имеющимся
+
+                    for group in tile_properties[2:]:
+                        if group != None:
+                            exec(f'self.{group}.add(tile)')
+
                     x += self.step  # смещаемся вправо на ширину одной плитки
                 # Это добавление плиток для платформ
                 else:
