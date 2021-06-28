@@ -116,7 +116,7 @@ __№...I==|..#__
 ===============
 """
 level_7_map = \
-"""
+    """
 ____№.......I==
 ............!__
 ........<---;..
@@ -129,7 +129,7 @@ ____№.......I==
 =========`-----
 """
 level_8_map = \
-"""
+    """
 =="___№...#___'
 ==|...........I
 "_№...........I
@@ -142,7 +142,7 @@ level_8_map = \
 .I==|........<,
 """
 level_9_map = \
-"""
+    """
 "____№...#____'
 |.............I
 |.............I
@@ -155,7 +155,7 @@ level_9_map = \
 ===============
 """
 level_10_map = \
-"""
+    """
 "____№...#____'
 |.............I
 |.............I
@@ -167,6 +167,8 @@ $[[[[)...([[[[@
 `---->~~~<----,
 =====|...I=====
 """
+
+
 # Очень важно, чтобы кол-во символов в ряду совпадало (хотя генератор от этого не сломается
 # но выглядеть будет лучше. Точки обозначают пустое место, поэтому можно все дозаполнить ими
 
@@ -227,7 +229,6 @@ class Level:  # Тот самый класс, ради которого писа
         """
         # Это группа спрайтов представляет собой все тайлы, которые есть на уровне.
 
-
         split_map = level_map.split('\n')  # Разделяем "карту" на отдельные слои
 
         # Иногда карта уровня будет содержать пустые слои, которые образуется от переноса строк в начале и в конце
@@ -268,19 +269,19 @@ class Level:  # Тот самый класс, ради которого писа
                     x += self.step  # смещаемся вправо на ширину одной плитки
                 # Это добавление плиток для платформ
                 else:
-                    platform = Platform(x, y) # так как платформа добавляется в несоколько групп, то ее нужно
+                    platform = Platform(x, y)  # так как платформа добавляется в несоколько групп, то ее нужно
                     # занести в отдельную переменную, иначе мы будем добавлять 2 разные платформы
                     self.level.add(platform)  # собственно добавление
                     self.platforms.add(platform)  # Чтобы было удобнее обрабатывать физику платформ, я добавил
                     # отдельную группу
-                    x += self.step # смещение вправо
+                    x += self.step  # смещение вправо
             # спускаемся вниз
             y += self.step
 
         # Это - фон
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
-    
+
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -303,7 +304,7 @@ class Tile(pg.sprite.Sprite):
         image = pg.image.load(img_file_src).convert()
         self.rect = image.get_rect()
         self.image = pg.transform.rotate(image, degree)
-        self.image.set_colorkey((0, 0, 0)) # Это чтобы у скошенных кирпичей не было чёрного фона
+        self.image.set_colorkey((0, 0, 0))  # Это чтобы у скошенных кирпичей не было чёрного фона
         self.rect.x = x
         self.rect.y = y
         self.speed = 2
@@ -323,20 +324,27 @@ class Tile(pg.sprite.Sprite):
     def move(self):  # Тут я пытался заставить плитки двигаться, но не получилось
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.y += self.speed
+            self.rect.y += self.speed
         if keys[pg.K_s]:
-            self.y -= self.speed
+            self.rect.y -= self.speed
         if keys[pg.K_a]:
-            self.y += self.speed
+            self.rect.x += self.speed
         if keys[pg.K_d]:
-            self.y -= self.speed
+            self.rect.x -= self.speed
         self.update()
+
+    def change_size(self, multiplier: None, new_size: tuple = None):
+        if multiplier is None:
+            self.image = pg.transform.scale(self.image, new_size)
+        else:
+            self.size = pg.transform.scale(self.image, [self.rect.x * multiplier, self.rect.y * multiplier])
+
 
 # Это класс для полупрозрачных платформ. Так как на них можно запрыгнуть снизу,
 # взаимодействие г. г. с ними нужно прописать отдельно (возможно, ты уже знаешь).
 class Platform(Tile):
     size = 50
-    
+
     def __init__(self, x, y):
         Tile.__init__(self, 'Textures/platform.png', 0, x, y)
         self.speed = 2
