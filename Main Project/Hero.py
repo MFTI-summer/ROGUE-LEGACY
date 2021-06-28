@@ -89,8 +89,14 @@ class Hero(pg.sprite.Sprite):
             self.current_speed['y'] -= g * dt
             self.rect.y -= self.current_speed['y']
 
+            collide_check = self.check_collision()
+
             if self.current_speed['y'] <= -300:  # из-за сопротивления воздуха человек не может падать быстрее
                 self.current_speed['y'] = -300  # выставляем максимальную допустимую скорость падения
+
+            if collide_check[0]:
+                self.current_speed['y'] = 0
+                self.rect.bottom += self.level.level.sprites()[collide_check[1]].rect.top - self.rect.bottom
 
             if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
                 # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
