@@ -1,7 +1,7 @@
 import pygame as pg
 
 WIN_width = 1000
-WIN_height = 700
+WIN_height = 500
 
 fps = 60
 
@@ -10,7 +10,6 @@ class Hero(pg.sprite.Sprite):
 
     def __init__(self):
         # ща буит куча переменных, поэтому держись
-
         # Необходимые для анимации переменные
         self.facing = 0  # 0 - налево, 1 - направо
         self.animation = {  # Тут собраны все анимации, доступные герою
@@ -20,7 +19,7 @@ class Hero(pg.sprite.Sprite):
         # Переменные для передвижения
         self.move_speed = {  # то, с какой скоростью герой может двигаться
             'x': 5,  # с какой скоростью герой бегает
-            'y': 10  # с какой силой герой прыгает
+            'y': 7  # с какой силой герой прыгает
         }
         self.current_speed = {
             'x': 0,
@@ -32,23 +31,24 @@ class Hero(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animation['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
         self.rect = self.image.get_rect()
+        self.level = None
 
     def update(self, surface: pg.surface.Surface, level=None):
         self.check_controls()
-        self.image = self.get_frame()
+        self.image = self.get_frame()  # просчитываем кадр анимации
         self.draw(surface, self.image)
 
     def draw(self, surface: pg.surface.Surface, image):
 
         surface.blit(self.image, self.rect)
 
-    def get_frame(self):
+    def get_frame(self):  # Узнаем, на каком кадре находится анимация
         frame = int((self.walk_state // 3) % len(self.animation['walk']))
         return pg.transform.flip(self.animation['walk'][frame], self.facing, 0)
 
     def check_controls(self):
         """
-        Изменяет координаты пероснажа, а также рассчитывает его анимацию
+        Изменяет координаты пероснажа, а также помогает с рассчетом анимации
         :return: Конкретное изображение из анимации героя
         """
         keys = pg.key.get_pressed()
@@ -63,7 +63,7 @@ class Hero(pg.sprite.Sprite):
         else:
             self.current_speed['x'] = 0
             self.walk_state = 1
-        self.check_jump(keys)
+        self.check_jump(keys)  # Проверяем состояние прыжка
         self.rect.x += self.current_speed['x']
 
     def check_jump(self, keys):
@@ -82,7 +82,6 @@ class Hero(pg.sprite.Sprite):
 
         # Да простит меня преподаватель, сопротивлением воздуха я пренебрегу, а то с тригонометрией возится - такое себе
 
-        # Очень длинно проверяем, не нажат ли пробел
         if keys[pg.K_SPACE] and not self.is_jump:
             self.is_jump = True
             self.current_speed['y'] = self.move_speed['y']
@@ -94,10 +93,20 @@ class Hero(pg.sprite.Sprite):
                 self.current_speed['y'] = -300  # выставляем максимальную допустимую скорость падения
 
             if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
-                # платформ нет, то проверяю столкновение с полом
+                # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
                 self.rect.y += WIN_height - self.rect.bottom
                 self.is_jump = False
 
+    def set_level(self, level: pg.sprite.Group):
+        self.level = level
+
+    def check_collision(self):
+        """
+        Втолкнулся ли герой с тайлом уровня
+        :return: массив из булева значения и индекса объекта, с которым произошло столкновение
+        """
+        index = self.rect.collidelist(self.level.level.sprites())
+        return [index != -1, index]
 
 def main():
     display = pg.display.set_mode((WIN_width, WIN_height))
@@ -107,6 +116,7 @@ def main():
         display.fill([255] * 3)
 
         hero.update(display)
+
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 return
