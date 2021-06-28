@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
         hero.update(display)
         level.update(display)
-        print(hero.check_collision())
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False

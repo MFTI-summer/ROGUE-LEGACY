@@ -277,7 +277,7 @@ class Level:  # Тот самый класс, ради которого писа
                     self.level.add(tile)  # добавляем новую плитку к уже имеющимся
 
                     for group in tile_properties[2:]:
-                        if group != None:
+                        if group is not None:
                             exec(f'self.{group}.add(tile)')
 
                     x += self.step  # смещаемся вправо на ширину одной плитки
@@ -361,6 +361,7 @@ class Platform(Tile):
 
     def __init__(self, x, y):
         Tile.__init__(self, 'Textures/platform.png', 0, x, y)
+        self.rect.height = 10
         self.speed = 2
 
 
