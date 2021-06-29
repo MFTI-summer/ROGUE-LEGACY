@@ -32,6 +32,7 @@ class Hero(pg.sprite.Sprite):
         self.image = self.animation['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
         self.rect = self.image.get_rect()
         self.level = None
+        self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
 
     def update(self, surface: pg.surface.Surface, level=None):
         self.check_controls()
@@ -52,31 +53,29 @@ class Hero(pg.sprite.Sprite):
         :return: Конкретное изображение из анимации героя
         """
         keys = pg.key.get_pressed()
-        if keys[pg.K_a]:
-            self.current_speed['x'] = self.move_speed['x'] * (-1)
-            self.facing = 0
-            self.walk_state += 1 / 3
 
-
-        elif keys[pg.K_d]:
+        if keys[pg.K_d]:  # вправо
             self.current_speed['x'] = self.move_speed['x']
             self.facing = 1
             self.walk_state += 1 / 3
+            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
+            for wall in walls:
+                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
+                    self.current_speed['x'] = 0
+        elif keys[pg.K_a]:
+            self.current_speed['x'] = self.move_speed['x'] * -1
+            self.facing = 0
+            self.walk_state += 1 / 3
+            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
+            for wall in walls:
+                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
+                    self.current_speed['x'] = 0
 
         else:
             self.current_speed['x'] = 0
             self.walk_state = 1
 
         self.check_gravity(keys)  # Проверяем состояние прыжка
-
-        if self.collided():
-            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
-            for wall in walls:
-                if self.rect.left <= wall.rect.right or self.rect.right >= wall.rect.left:
-                    print(self.rect.bottom, ',', wall.rect.top, ';', self.rect.top, ',', wall.rect.bottom)
-                    if (wall.rect.bottom - 5 >= self.rect.top > wall.rect.top) or (
-                            wall.rect.top + 5 <= self.rect.bottom < wall.rect.bottom):
-                        self.current_speed['x'] = 0
 
         self.rect.x += self.current_speed['x']
 
@@ -118,16 +117,20 @@ class Hero(pg.sprite.Sprite):
                         if platform.rect.top + 10 > self.rect.bottom >= platform.rect.top:
                             self.current_speed['y'] = 0
                             self.is_jump = False
+                            self.rect.y += platform.rect.top - self.rect.bottom
                             break
                     for floor_tile in floor:
                         if floor_tile.rect.top < self.rect.bottom < floor_tile.rect.top + 10:
                             self.current_speed['y'] = 0
                             self.is_jump = False
+                            self.rect.y += floor_tile.rect.top - self.rect.bottom
+                            break
                 if self.current_speed['y'] > 0:
                     celling = pg.sprite.spritecollide(self, self.level.celling, dokill=False)
                     for celling_tile in celling:
-                        if self.rect.top <= celling_tile.rect.bottom:
+                        if celling_tile.rect.bottom - 10 < self.rect.top <= celling_tile.rect.bottom:
                             self.current_speed['y'] = 0
+                            self.rect.top += celling_tile.rect.bottom - self.rect.top
 
             # if self.current_speed['y'] < 0 and collide_check[0]:
             #     self.current_speed['y'] = 0
