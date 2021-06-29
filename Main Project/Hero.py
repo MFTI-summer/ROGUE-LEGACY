@@ -89,15 +89,42 @@ class Hero(pg.sprite.Sprite):
             self.current_speed['y'] -= g * dt
             self.rect.y -= self.current_speed['y']
 
-            collide_check = self.check_collision()
-
             if self.current_speed['y'] <= -300:  # из-за сопротивления воздуха человек не может падать быстрее
                 self.current_speed['y'] = -300  # выставляем максимальную допустимую скорость падения
 
+            collide_check = self.check_collision()
+
             if collide_check[0]:
-                self.current_speed['y'] = 0
-                self.rect.bottom += self.level.level.sprites()[collide_check[1]].rect.top - self.rect.bottom
-                self.is_jump = False
+                if self.current_speed['y'] > 0:
+                    index = self.rect.collidelist(self.level.celling.sprites())
+                    if index != -1:
+                        self.current_speed['y'] = 0
+
+                if self.current_speed['y'] < 0:
+                    platform_index = self.rect.collidelist(self.level.platforms.sprites())
+                    platform_rect = self.level.platforms.sprites()[platform_index].rect
+                    floor_index = self.rect.collidelist(self.level.floor.sprites())
+                    floor_rect = self.level.floor.sprites()[floor_index].rect
+                    if platform_index != -1 and platform_rect.top <= self.rect.bottom < platform_rect.bottom:
+                        self.current_speed['y'] = 0
+                        # self.rect.y -= self.rect.bottom - floor_rect.top
+                        self.is_jump = False
+                    if floor_index != -1 and floor_rect.top - 1 <= self.rect.bottom < floor_rect.top + 10:
+                        self.current_speed['y'] = 0
+                        self.is_jump = False
+
+                if self.current_speed['x'] != 0:
+                    wall_index = self.rect.collidelist(self.level.walls.sprites())
+                    wall_rect = self.level.walls.sprites()[wall_index].rect
+                    if wall_index != -1:
+                        if self.rect.x <= wall_rect.right or self.rect.right >= wall_rect.left:
+                            self.current_speed['x'] = 0
+
+
+            # if self.current_speed['y'] < 0 and collide_check[0]:
+            #     self.current_speed['y'] = 0
+            #     self.rect.bottom += self.level.level.sprites()[collide_check[1]].rect.top - self.rect.bottom
+            #     self.is_jump = False
 
             if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
                 # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
@@ -114,6 +141,7 @@ class Hero(pg.sprite.Sprite):
         """
         index = self.rect.collidelist(self.level.level.sprites())
         return [index != -1, index]
+
 
 def main():
     display = pg.display.set_mode((WIN_width, WIN_height))
