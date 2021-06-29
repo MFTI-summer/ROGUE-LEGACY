@@ -31,7 +31,7 @@ def generate_map():
     level_map[5][14] = '.'
 
     # Чтобы герой мог пройти из одного конца уровня в другой, проверяется, можно ли
-    # с данной плитки уйти вправо или вверх
+    # с данной плитки попасть в на пустые плитки в конце уровня
     # и если нет, то справа или сверху добавляется пустая клетка (т. е. точка)
     for x in range (0, row):
         for y in range (4, 6):
@@ -41,23 +41,6 @@ def generate_map():
                 level_map[y+1][x] = '.'
             if y > 5 and level_map[y-1][x] != '.':
                 level_map[y-1][x] = '.'
-    # Чтобы кирпичи не "висели в воздухе"
-    for x in range(0, col):
-        for y in range(0, row):
-            if 0 < x < 14 and 5 < y < 9 and level_map[y+1][x] == '.':
-                if level_map[y][x-1] == '.' or level_map[y][x+1] == '.':
-                    level_map[y+1][x] = '='
-            elif 0 < x < 14 and 0 < y < 3 and level_map[y-1][x] == '.':
-                if level_map[y][x-1] == '.' or level_map[y][x+1] == '.':
-                    level_map[y-1][x] = '='
-            elif x == 0 and 0 < y < 3 and level_map[y-1][x] == '.' and level_map[y][x+1] == '.':
-                level_map[y-1][x] = '='
-            elif x == 14 and 0 < y < 3 and level_map[y-1][x] == '.' and level_map[y][x-1] == '.':
-                level_map[y-1][x] = '='
-            elif x == 0 and 5 < y < 9 and level_map[y+1][x] == '.' and level_map[y][x+1] == '.':
-                level_map[y+1][x] = '='
-            elif x == 14 and 5 < y < 9 and level_map[y+1][x] == '.' and level_map[y][x-1] == '.':
-                level_map[y+1][x] = '='
     # Чтобы у кирпичей была полоска, если это нужно
     for x in range(0, col):
         for y in range(0, row):
