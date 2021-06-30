@@ -30,6 +30,7 @@ def generate_map():
     level_map[4][14] = '.'
     level_map[5][14] = '.'
 
+    # Чтобы кирпичи не висели в воздухе
     for x in range(0, col):
         for y in range(0, row):
             if 0 < x < 14 and 5 < y < 9 and level_map[y+1][x] == '.':
