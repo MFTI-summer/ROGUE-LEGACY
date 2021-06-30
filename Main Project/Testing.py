@@ -17,8 +17,8 @@ if __name__ == '__main__':
 
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
-    heal_potion = Item.HealItem(30, 0, 0)
-    mana_potion = Item.RestoreManaItem(50, 0, 0)
+    heal_potion = Item.HealItem(30)
+    mana_potion = Item.RestoreManaItem(50)
     hero = Hero.Hero(x=300, y=300)
     ui = UI.UI(hero, 5, WIN_height-5)
     for _ in range(9):
