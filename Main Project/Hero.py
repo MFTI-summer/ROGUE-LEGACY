@@ -11,6 +11,8 @@ class Hero(pg.sprite.Sprite):
     def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
+        self.hp = 10 # хп героя
+        self.mana = 100  # мана героя
         self.facing = 0  # 0 - налево, 1 - направо
         self.animation = {  # Тут собраны все анимации, доступные герою
             'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)]  # ходьба
