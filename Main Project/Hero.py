@@ -35,6 +35,7 @@ class Hero(pg.sprite.Sprite):
         #self.image = self.image.subsurface((20, 20, 50, 80)) #https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
         self.rect = self.image.get_rect(x = x, y=y)
         self.level = None
+        self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
 
     def update(self, surface: pg.surface.Surface, level=None):
         self.check_controls()
@@ -55,21 +56,33 @@ class Hero(pg.sprite.Sprite):
         :return: Конкретное изображение из анимации героя
         """
         keys = pg.key.get_pressed()
-        if keys[pg.K_a]:
-            self.current_speed['x'] = self.move_speed['x'] * (-1)
-            self.facing = 0
-            self.walk_state += 1 / 3
-        elif keys[pg.K_d]:
+
+        if keys[pg.K_d]:  # вправо
             self.current_speed['x'] = self.move_speed['x']
             self.facing = 1
             self.walk_state += 1 / 3
+            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
+            for wall in walls:
+                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
+                    self.current_speed['x'] = 0
+        elif keys[pg.K_a]:
+            self.current_speed['x'] = self.move_speed['x'] * -1
+            self.facing = 0
+            self.walk_state += 1 / 3
+            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
+            for wall in walls:
+                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
+                    self.current_speed['x'] = 0
+
         else:
             self.current_speed['x'] = 0
             self.walk_state = 1
-        self.check_jump(keys)  # Проверяем состояние прыжка
+
+        self.check_gravity(keys)  # Проверяем состояние прыжка
+
         self.rect.x += self.current_speed['x']
 
-    def check_jump(self, keys):
+    def check_gravity(self, keys):
         """
         Вообще путь должен считать довольно простенько, принимая фиксированную скрость падения,
         чтобы всем было легко понять это движение, но я немного убитый, поэтому вот.
@@ -95,34 +108,32 @@ class Hero(pg.sprite.Sprite):
             if self.current_speed['y'] <= -300:  # из-за сопротивления воздуха человек не может падать быстрее
                 self.current_speed['y'] = -300  # выставляем максимальную допустимую скорость падения
 
-            collide_check = self.check_collision()
+            check_collide = self.collided()
 
-            if collide_check[0]:
+            if check_collide:
+                if self.current_speed['y'] < 0:  # Если падаем
+                    platforms = pg.sprite.spritecollide(self, self.level.platforms, dokill=False)
+                    floor = pg.sprite.spritecollide(self, self.level.floor, dokill=False)
+                    for platform in platforms:
+                        # print(platform)
+                        # print(platform.rect.top, self.rect.bottom)
+                        if platform.rect.top + 10 > self.rect.bottom >= platform.rect.top:
+                            self.current_speed['y'] = 0
+                            self.is_jump = False
+                            self.rect.y += platform.rect.top - self.rect.bottom
+                            break
+                    for floor_tile in floor:
+                        if floor_tile.rect.top < self.rect.bottom < floor_tile.rect.top + 10:
+                            self.current_speed['y'] = 0
+                            self.is_jump = False
+                            self.rect.y += floor_tile.rect.top - self.rect.bottom
+                            break
                 if self.current_speed['y'] > 0:
-                    index = self.rect.collidelist(self.level.celling.sprites())
-                    if index != -1:
-                        self.current_speed['y'] = 0
-
-                if self.current_speed['y'] < 0:
-                    platform_index = self.rect.collidelist(self.level.platforms.sprites())
-                    platform_rect = self.level.platforms.sprites()[platform_index].rect
-                    floor_index = self.rect.collidelist(self.level.floor.sprites())
-                    floor_rect = self.level.floor.sprites()[floor_index].rect
-                    if platform_index != -1 and platform_rect.top <= self.rect.bottom < platform_rect.bottom:
-                        self.current_speed['y'] = 0
-                        # self.rect.y -= self.rect.bottom - floor_rect.top
-                        self.is_jump = False
-                    if floor_index != -1 and floor_rect.top - 1 <= self.rect.bottom < floor_rect.top + 10:
-                        self.current_speed['y'] = 0
-                        self.is_jump = False
-
-                if self.current_speed['x'] != 0:
-                    wall_index = self.rect.collidelist(self.level.walls.sprites())
-                    wall_rect = self.level.walls.sprites()[wall_index].rect
-                    if wall_index != -1:
-                        if self.rect.x <= wall_rect.right or self.rect.right >= wall_rect.left:
-                            self.current_speed['x'] = 0
-
+                    celling = pg.sprite.spritecollide(self, self.level.celling, dokill=False)
+                    for celling_tile in celling:
+                        if celling_tile.rect.bottom - 10 < self.rect.top <= celling_tile.rect.bottom:
+                            self.current_speed['y'] = 0
+                            self.rect.top += celling_tile.rect.bottom - self.rect.top
 
             # if self.current_speed['y'] < 0 and collide_check[0]:
             #     self.current_speed['y'] = 0
@@ -137,13 +148,13 @@ class Hero(pg.sprite.Sprite):
     def set_level(self, level: pg.sprite.Group):
         self.level = level
 
-    def check_collision(self):
+    def collided(self):
         """
         Втолкнулся ли герой с тайлом уровня
         :return: массив из булева значения и индекса объекта, с которым произошло столкновение
         """
         index = self.rect.collidelist(self.level.level.sprites())
-        return [index != -1, index]
+        return index != -1
 
 
 def main():

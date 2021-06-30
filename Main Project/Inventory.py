@@ -6,7 +6,7 @@ class InventorySlot:
         self._type = type #Тип предмета
 
     def store_item(self, item):
-        if self._type == item.type:
+        if self._type == item.get_type():
             if len(self._buf) < self._length:
                 self._buf.append(item)
             else:
@@ -29,6 +29,9 @@ class Item:
     def __init__(self, type):
         self._type = type
 
+    def get_type(self):
+        return self._type
+
 
 class RestoreManaItem(Item):
     def __init__(self, mana):
@@ -46,5 +49,3 @@ class HealItem(Item):
 
     def use(self, hero):
         hero.heal(self._heal)
-
-
