@@ -1,6 +1,7 @@
 import pygame as pg
 import Tiles
 import Hero
+import UI
 
 if __name__ == '__main__':
 
@@ -14,7 +15,7 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
 
     hero = Hero.Hero(x=300, y=300)
-
+    ui = UI.UI(hero, 5, WIN_height-5)
     # hero.rect.x = 300
     # hero.rect.y = 300
     level = Tiles.Level(Tiles.level_12_map)
@@ -23,9 +24,10 @@ if __name__ == '__main__':
     while run:
         events = pg.event.get()
         display.fill([0] * 3)
-
+        ui.update()
         hero.update(display, events=events)
         level.update(display)
+        ui.display(display)
         for event in events:
             if event.type == pg.QUIT:
                 run = False
