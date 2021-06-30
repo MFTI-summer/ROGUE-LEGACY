@@ -36,6 +36,12 @@ class Hero(pg.sprite.Sprite):
         self.rect = self.image.get_rect(x = x, y=y)
         self.level = None
         self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
+        self.isCollided = {
+            'up': False,
+            'down': False,
+            'left': False,
+            'right': False
+        }
 
     def update(self, surface: pg.surface.Surface, level=None):
         self.check_controls()
@@ -57,22 +63,28 @@ class Hero(pg.sprite.Sprite):
         """
         keys = pg.key.get_pressed()
 
-        if keys[pg.K_d]:  # вправо
+        if keys[pg.K_d] and not self.isCollided['right']:  # вправо
             self.current_speed['x'] = self.move_speed['x']
             self.facing = 1
             self.walk_state += 1 / 3
+            self.isCollided['left'] = False
             walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
             for wall in walls:
                 if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
-                    self.current_speed['x'] = 0
-        elif keys[pg.K_a]:
+                    self.current_speed['x'] = wall.rect.left - self.rect.right
+                    self.isCollided['right'] = True
+
+        elif keys[pg.K_a] and not self.isCollided['left']:
             self.current_speed['x'] = self.move_speed['x'] * -1
             self.facing = 0
             self.walk_state += 1 / 3
+            self.isCollided['right'] = False
             walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
             for wall in walls:
                 if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
                     self.current_speed['x'] = 0
+                    self.isCollided['left'] = True
+
 
         else:
             self.current_speed['x'] = 0
@@ -98,8 +110,8 @@ class Hero(pg.sprite.Sprite):
 
         # Да простит меня преподаватель, сопротивлением воздуха я пренебрегу, а то с тригонометрией возится - такое себе
 
-        if keys[pg.K_SPACE] and not self.is_jump:
-            self.is_jump = True
+        if keys[pg.K_SPACE] and self.isCollided['down']:
+            self.isCollided['down'] = False
             self.current_speed['y'] = self.move_speed['y']
         else:  # если мы уже находимся в прыжке
             self.current_speed['y'] -= g * dt
@@ -119,13 +131,13 @@ class Hero(pg.sprite.Sprite):
                         # print(platform.rect.top, self.rect.bottom)
                         if platform.rect.top + 10 > self.rect.bottom >= platform.rect.top:
                             self.current_speed['y'] = 0
-                            self.is_jump = False
+                            self.isCollided['down'] = True
                             self.rect.y += platform.rect.top - self.rect.bottom
                             break
                     for floor_tile in floor:
                         if floor_tile.rect.top < self.rect.bottom < floor_tile.rect.top + 10:
                             self.current_speed['y'] = 0
-                            self.is_jump = False
+                            self.isCollided['down'] = True
                             self.rect.y += floor_tile.rect.top - self.rect.bottom
                             break
                 if self.current_speed['y'] > 0:
