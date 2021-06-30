@@ -18,6 +18,17 @@ if __name__ == '__main__':
 
     # hero.rect.x = 300
     # hero.rect.y = 300
+
+
+
+
+
+
+
+
+
+
+
     ui = UI.UI(hero, 5, WIN_height-5)
     level = Tiles.Level(Tiles.level_10_map)
     hero.set_level(level)
