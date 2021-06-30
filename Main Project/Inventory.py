@@ -1,9 +1,12 @@
-class InventorySlot:
+import pygame.sprite
+
+
+class InventorySlot(pygame.sprite.Sprite):
     def __init__(self, length, hero, type):
-        self._length = length #Максимальная вместимость слота
+        self._length = length  # Максимальная вместимость слота
         self._buf = []  # Предметы в слоте
         self._hero = hero
-        self._type = type #Тип предмета
+        self._type = type  # Тип предмета
 
     def store_item(self, item):
         if self._type == item.get_type():
@@ -23,29 +26,3 @@ class InventorySlot:
 
     def get_max_inventory_load(self):
         return self._length
-
-
-class Item:
-    def __init__(self, type):
-        self._type = type
-
-    def get_type(self):
-        return self._type
-
-
-class RestoreManaItem(Item):
-    def __init__(self, mana):
-        super().__init__("MANA")
-        self._mana = mana
-
-    def use(self, hero):
-        hero.restore_mana(self._mana)
-
-
-class HealItem(Item):
-    def __init__(self, heal):
-        super().__init__("HP")
-        self._heal = heal  #Сколько восстановит
-
-    def use(self, hero):
-        hero.heal(self._heal)

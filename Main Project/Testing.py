@@ -17,18 +17,16 @@ if __name__ == '__main__':
 
     # hero.rect.x = 300
     # hero.rect.y = 300
-
     level = Tiles.Level(Tiles.level_10_map)
     hero.set_level(level)
 
     while run:
-
+        events = pg.event.get()
         display.fill([0] * 3)
 
-        hero.update(display)
+        hero.update(display, events=events)
         level.update(display)
-
-        for event in pg.event.get():
+        for event in events:
             if event.type == pg.QUIT:
                 run = False
         pg.display.update()

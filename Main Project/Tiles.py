@@ -211,18 +211,18 @@ class Level:  # Тот самый класс, ради которого писа
     tiles_dict = {
         '.': None,
         '=': ['Textures/usual.png', 0, None],
-        '<': ['Textures/border_angle_up_left.png', 0, 'walls', 'floor'],
-        '>': ['Textures/border_angle_up_right.png', 0, 'walls', 'floor'],
-        '№': ['Textures/border_angle_down_right.png', 0, 'walls', 'celling'],
-        '#': ['Textures/border_angle_down_left.png', 0, 'walls', 'celling'],
+        '<': ['Textures/border_angle_up_left.png', 0, 'walls_left', 'floor'],
+        '>': ['Textures/border_angle_up_right.png', 0, 'walls_right', 'floor'],
+        '№': ['Textures/border_angle_down_right.png', 0, 'walls_right', 'celling'],
+        '#': ['Textures/border_angle_down_left.png', 0, 'walls_left', 'celling'],
         '_': ['Textures/border_down.png', 0, 'celling'],
         '-': ['Textures/border_up.png', 0, 'floor'],
-        '|': ['Textures/border_vertical_right.png', 0, 'walls'],
-        'I': ['Textures/border_vertical_left.png', 0, 'walls'],
-        ':': ['Textures/border_vertical_and_corner_down-left.png', 0, 'walls'],
-        ';': ['Textures/border_vertical_and_corner_up-left.png', 0, 'walls'],
-        '!': ['Textures/border_vertical_and_corner_down-right.png', 0, 'walls'],
-        '?': ['Textures/border_vertical_and_corner_up-right.png', 0, 'walls'],
+        '|': ['Textures/border_vertical_right.png', 0, 'walls_right'],
+        'I': ['Textures/border_vertical_left.png', 0, 'walls_left'],
+        ':': ['Textures/border_vertical_and_corner_down-left.png', 0, 'walls_left'],
+        ';': ['Textures/border_vertical_and_corner_up-left.png', 0, 'walls_left'],
+        '!': ['Textures/border_vertical_and_corner_down-right.png', 0, 'walls_right'],
+        '?': ['Textures/border_vertical_and_corner_up-right.png', 0, 'walls_right'],
         '`': ['Textures/corner_up_right.png', 0, None],
         ',': ['Textures/corner_up_left.png', 0, None],
         '"': ['Textures/corner_down_right.png', 0, None],
@@ -232,11 +232,11 @@ class Level:  # Тот самый класс, ради которого писа
         '@': ['Textures/two_corners_left.png', 0, None],
         '$': ['Textures/two_corners_right.png', 0, None],
         '[': ['Textures/borders_down_and_up.png', 0, 'floor', 'celling'],
-        ']': ['Textures/borders_left_and_right.png', 0, 'walls'],
-        '{': ['Textures/Three_borders_up.png', 0, 'walls', 'floor'],
-        '}': ['Textures/Three_borders_down.png', 0, 'walls', 'celling'],
-        ')': ['Textures/Three_borders_right.png', 0, 'walls', 'floor', 'celling'],
-        '(': ['Textures/Three_borders_left.png', 0, 'walls', 'floor', 'celling'],
+        ']': ['Textures/borders_left_and_right.png', 0, 'walls_left', 'walls_right'],
+        '{': ['Textures/Three_borders_up.png', 0, 'walls_left', 'walls_right', 'floor'],
+        '}': ['Textures/Three_borders_down.png', 0, 'walls_left', 'walls_right', 'celling'],
+        ')': ['Textures/Three_borders_right.png', 0, 'walls_right', 'floor', 'celling'],
+        '(': ['Textures/Three_borders_left.png', 0, 'walls_left', 'floor', 'celling'],
         '/': ['Textures/side_left.png', 0, 'triangle', 'floor'],
         '%': ['Textures/side_right.png', 0, 'triangle', 'floor']
     }
@@ -247,7 +247,8 @@ class Level:  # Тот самый класс, ради которого писа
         self.level = pg.sprite.Group()  # Весь уровень
         self.platforms = pg.sprite.Group()  # платформы
         self.celling = pg.sprite.Group()  # потолок
-        self.walls = pg.sprite.Group()  # стены
+        self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
+        self.walls_right = pg.sprite.Group()  # Стены, смотрящие вправо (Watch dogs)
         self.floor = pg.sprite.Group()  # пол
         # Генерировать уровень
         self.generate_level(level_map)
