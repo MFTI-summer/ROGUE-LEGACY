@@ -13,10 +13,10 @@ if __name__ == '__main__':
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
 
-    hero = Hero.Hero()
+    hero = Hero.Hero(x=300, y=300)
 
-    hero.rect.x = 300
-    hero.rect.y = 300
+    # hero.rect.x = 300
+    # hero.rect.y = 300
 
     level = Tiles.Level(Tiles.level_10_map)
     hero.set_level(level)

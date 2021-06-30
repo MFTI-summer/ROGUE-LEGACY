@@ -1,9 +1,9 @@
 class InventorySlot:
     def __init__(self, length, hero, type):
-        self._length = length
-        self._buf = []
+        self._length = length #Максимальная вместимость слота
+        self._buf = []  # Предметы в слоте
         self._hero = hero
-        self._type = type
+        self._type = type #Тип предмета
 
     def store_item(self, item):
         if self._type == item.get_type():
@@ -45,7 +45,7 @@ class RestoreManaItem(Item):
 class HealItem(Item):
     def __init__(self, heal):
         super().__init__("HP")
-        self._heal = heal
+        self._heal = heal  #Сколько восстановит
 
     def use(self, hero):
         hero.heal(self._heal)
