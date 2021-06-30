@@ -17,7 +17,6 @@ if __name__ == '__main__':
 
     # hero.rect.x = 300
     # hero.rect.y = 300
-
     level = Tiles.Level(Tiles.level_10_map)
     hero.set_level(level)
 
@@ -27,7 +26,6 @@ if __name__ == '__main__':
 
         hero.update(display, events=events)
         level.update(display)
-
         for event in events:
             if event.type == pg.QUIT:
                 run = False
