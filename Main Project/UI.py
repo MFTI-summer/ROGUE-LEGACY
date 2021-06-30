@@ -29,4 +29,4 @@ class UI:
         self.heal_slot.display(surface)
         self.mana_slot.display(surface)
         surface.blit(self.hp_bar, self.hp_bar_rect)
-        surface.blit(self.mana_bar,self.mana_bar_rect)
+        surface.blit(self.mana_bar, self.mana_bar_rect)

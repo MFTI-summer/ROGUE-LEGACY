@@ -4,7 +4,7 @@ pygame.font.init()
 
 
 class InventorySlot(pygame.sprite.Sprite):
-    f1 = pygame.font.SysFont('Arial', 30,True)
+    f1 = pygame.font.SysFont('Arial', 30, True)
 
     def __init__(self, length, hero, type, sprite_path, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -19,7 +19,7 @@ class InventorySlot(pygame.sprite.Sprite):
     def display(self, surface: pygame.Surface):
         count = self.f1.render(str(self.get_number_of_stored_items()), True, (255, 0, 0))
         surface.blit(self.image, self.rect)
-        surface.blit(count, (self.rect.right-5,self.rect.centery-5))
+        surface.blit(count, (self.rect.right-5, self.rect.centery-5))
 
     def store_item(self, item):
         if self.type == item.get_type():
