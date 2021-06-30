@@ -24,9 +24,9 @@ if __name__ == '__main__':
     while run:
         events = pg.event.get()
         display.fill([0] * 3)
-        ui.update()
         hero.update(display, events=events)
         level.update(display)
+        ui.update()
         ui.display(display)
         for event in events:
             if event.type == pg.QUIT:
