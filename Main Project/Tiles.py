@@ -250,6 +250,7 @@ class Level:  # Тот самый класс, ради которого писа
         self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
         self.walls_right = pg.sprite.Group()  # Стены, смотрящие вправо (Watch dogs)
         self.floor = pg.sprite.Group()  # пол
+        self.triangle = pg.sprite.Group()
         # Генерировать уровень
         self.generate_level(level_map)
 

@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # hero.rect.x = 300
     # hero.rect.y = 300
-    level = Tiles.Level(Tiles.level_10_map)
+    level = Tiles.Level(Tiles.level_12_map)
     hero.set_level(level)
 
     while run:

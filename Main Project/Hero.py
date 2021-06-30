@@ -170,7 +170,7 @@ class Hero(pg.sprite.Sprite):
             if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
                 # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
                 self.rect.y += WIN_height - self.rect.bottom
-                self.collided['down'] = True
+                self.isCollided['down'] = True
 
     def set_level(self, level: pg.sprite.Group):
         self.level = level
