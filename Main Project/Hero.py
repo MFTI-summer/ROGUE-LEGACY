@@ -7,12 +7,14 @@ fps = 60
 
 
 class Hero(pg.sprite.Sprite):
+    MAX_HP = 100
+    MAX_MANA = 100
 
     def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
-        self.hp = 100 # хп героя
-        self.mana = 100  # мана героя
+        self.hp = Hero.MAX_HP  # хп героя
+        self.mana = Hero.MAX_MANA  # мана героя
         self.facing = 0  # 0 - налево, 1 - направо
         self.animation = {  # Тут собраны все анимации, доступные герою
             'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)]  # ходьба
@@ -87,10 +89,10 @@ class Hero(pg.sprite.Sprite):
             self.facing = 0  # поворачиваемся Влево
             self.walk_state += 1 / 3  # Продвигает анимацию
             walls = pg.sprite.spritecollide(self, self.level.walls_right, dokill=False)  # стены, с которыми мы
-                                                                                            # столкнулись
+            # столкнулись
             for wall in walls:
                 if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):  # можем ли мы напороться
-                                                                                            # на это пузом
+                    # на это пузом
                     self.current_speed['x'] = 0  # Если можем, то останавливаемся
 
 
@@ -184,6 +186,30 @@ class Hero(pg.sprite.Sprite):
         """
         index = self.rect.collidelist(self.level.level.sprites())
         return index != -1
+
+    def heal(self, hp):
+        self.hp += hp
+        if self.hp > Hero.MAX_HP:
+            self.hp = Hero.MAX_HP
+
+    def restore_mana(self, mana):
+        self.mana += mana
+        if self.mana > Hero.MAX_MANA:
+            self.mana = Hero.MAX_MANA
+
+    def get_hp(self):
+        return self.hp
+
+    def get_mana(self):
+        return self.mana
+
+    def death(self):
+        pass
+
+    def damage(self, damage):
+        self.hp -= damage
+        if self.hp < 0:
+            self.death()
 
 
 class Bullet(pg.sprite.Sprite):

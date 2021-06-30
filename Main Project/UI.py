@@ -8,21 +8,21 @@ class UI:
         self.mana_slot = Inventory.InventorySlot(10, hero, "MANA", "Textures/mana potion.png", self.heal_slot.rect.right+15, y)
         self.hero = hero
 
-        self.mana_bar = pygame.Surface((1.5*hero.mana, 10))
+        self.mana_bar = pygame.Surface((1.5*hero.get_mana(), 10))
         self.mana_bar_rect = self.mana_bar.get_rect()
         self.mana_bar_rect.bottomleft = self.heal_slot.rect.topleft
         self.mana_bar.fill((0, 0, 255))
 
-        self.hp_bar = pygame.Surface((1.5*hero.hp, 10))
+        self.hp_bar = pygame.Surface((1.5*hero.get_hp(), 10))
         self.hp_bar_rect = self.hp_bar.get_rect()
         self.hp_bar_rect.bottomleft = self.mana_bar_rect.topleft
         self.hp_bar.fill((255, 0, 0))
 
     def update(self):
-        self.mana_bar = pygame.Surface((1.5*self.hero.mana, 10))
+        self.mana_bar = pygame.Surface((1.5*self.hero.get_mana(), 10))
         self.mana_bar.fill((0, 0, 255))
 
-        self.hp_bar = pygame.Surface((1.5*self.hero.hp, 10))
+        self.hp_bar = pygame.Surface((1.5*self.hero.get_hp(), 10))
         self.hp_bar.fill((255, 0, 0))
 
     def display(self, surface: pygame.Surface):

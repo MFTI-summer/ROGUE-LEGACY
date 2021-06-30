@@ -31,8 +31,9 @@ class InventorySlot(pygame.sprite.Sprite):
             raise Exception("TYPE OF ITEM IS NOT CORRECT")
 
     def use_item(self):
-        if len(self.buf) > 0:
-            self.buf.pop().use(self.hero)
+        if self.hero.hp < 100:
+            if len(self.buf) > 0:
+                self.buf.pop().use(self.hero)
 
     def get_number_of_stored_items(self):
         return len(self.buf)
