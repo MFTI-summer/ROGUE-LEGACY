@@ -4,7 +4,7 @@ WIN_width = 1000
 WIN_height = 500
 
 FPS = 60
-GRAVITY = 12 / FPS
+GRAVITY = 12.4 / FPS
 
 
 class Hero(pg.sprite.Sprite):
@@ -57,20 +57,23 @@ class Hero(pg.sprite.Sprite):
         if not self.isCollided['down']:
             self.current_speed['y'] += GRAVITY
 
-        self.animation()
         self.isCollided['down'] = False  # заново проверяем, стоим ли мы
         self.rect.y += self.current_speed['y']
         self.checkCollide_y()
         self.rect.x += self.current_speed['x']
         self.checkCollide_x()
-
+        # Делаем анимацию
+        self.animation()
+        # Рисуем все
+        self.bullets.update()
+        self.bullets.draw(surface)
         self.draw(surface)
 
     def draw(self, surface: pg.surface.Surface):  # Отрисовать героя на экране
 
         surface.blit(pg.transform.flip(self.image, bool(self.facing), 0), self.rect)
 
-    def get_frame(self):  # Узнаем, на каком кадре находится анимация
+    def set_frame(self):  # Узнаем, на каком кадре находится анимация
         frame = int((self.walk_state // 3) % len(self.animations['walk']))  # при каждом передвижении мы немного
         # увеличиваем переменную self.walkstate
         self.image = self.animations['walk'][frame]
@@ -134,21 +137,13 @@ class Hero(pg.sprite.Sprite):
     def animation(self):
         if self.current_speed['x'] < 0:  # Влево
             self.facing = 0
-            self.walk_state += 1/3
+            self.walk_state += 1 / 3
         elif self.current_speed['x'] > 0:  # Вправо
             self.facing = 1
-            self.walk_state += 1/3
+            self.walk_state += 1 / 3
         else:
             self.walk_state = 1
-        self.get_frame()
-
-    def collided(self):
-        """
-        Втолкнулся ли герой с тайлом уровня
-        :return: массив из булева значения и индекса объекта, с которым произошло столкновение
-        """
-        index = self.rect.collidelist(self.level.level.sprites())
-        return index != -1
+        self.set_frame()
 
     def heal(self, hp):
         self.hp += hp
@@ -192,8 +187,9 @@ class Bullet(pg.sprite.Sprite):
         self.rect.center = startPos
         self.speed = 10  # скорость по х
 
-    def update(self, *args, **kwargs) -> None:
+    def update(self) -> None:
         self.rect.x += self.speed * (1 if self.direction == 0 else -1)
+
 
 
 def main():
