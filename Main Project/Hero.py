@@ -63,27 +63,23 @@ class Hero(pg.sprite.Sprite):
         """
         keys = pg.key.get_pressed()
 
-        if keys[pg.K_d] and not self.isCollided['right']:  # вправо
+        if keys[pg.K_d]:  # вправо
             self.current_speed['x'] = self.move_speed['x']
             self.facing = 1
             self.walk_state += 1 / 3
-            self.isCollided['left'] = False
-            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
-            for wall in walls:
-                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
-                    self.current_speed['x'] = wall.rect.left - self.rect.right
-                    self.isCollided['right'] = True
-
-        elif keys[pg.K_a] and not self.isCollided['left']:
-            self.current_speed['x'] = self.move_speed['x'] * -1
-            self.facing = 0
-            self.walk_state += 1 / 3
-            self.isCollided['right'] = False
-            walls = pg.sprite.spritecollide(self, self.level.walls, dokill=False)
+            walls = pg.sprite.spritecollide(self, self.level.walls_left, dokill=False)
             for wall in walls:
                 if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
                     self.current_speed['x'] = 0
-                    self.isCollided['left'] = True
+
+        elif keys[pg.K_a]:
+            self.current_speed['x'] = self.move_speed['x'] * -1
+            self.facing = 0
+            self.walk_state += 1 / 3
+            walls = pg.sprite.spritecollide(self, self.level.walls_right, dokill=False)
+            for wall in walls:
+                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):
+                    self.current_speed['x'] = 0
 
 
         else:
