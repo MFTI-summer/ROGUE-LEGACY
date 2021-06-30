@@ -4,7 +4,7 @@ WIN_width = 1000
 WIN_height = 500
 
 FPS = 60
-GRAVITY = 10 / FPS
+GRAVITY = 12 / FPS
 
 
 class Hero(pg.sprite.Sprite):
@@ -40,8 +40,6 @@ class Hero(pg.sprite.Sprite):
         # https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
         self.rect = self.image.get_rect(x=x, y=y)  # располагаем героя в определенной точке пространства
         self.level = None
-        # Лямбда, которая проверяет, может ли герой столкнуться телом с препятствием
-        self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
         # Упирается ли герой во что-то
         self.isCollided = {
             'up': False,
@@ -59,13 +57,13 @@ class Hero(pg.sprite.Sprite):
         if not self.isCollided['down']:
             self.current_speed['y'] += GRAVITY
 
+        self.animation()
         self.isCollided['down'] = False  # заново проверяем, стоим ли мы
         self.rect.y += self.current_speed['y']
         self.checkCollide_y()
         self.rect.x += self.current_speed['x']
         self.checkCollide_x()
 
-        self.animation()
         self.draw(surface)
 
     def draw(self, surface: pg.surface.Surface):  # Отрисовать героя на экране
@@ -75,7 +73,7 @@ class Hero(pg.sprite.Sprite):
     def get_frame(self):  # Узнаем, на каком кадре находится анимация
         frame = int((self.walk_state // 3) % len(self.animations['walk']))  # при каждом передвижении мы немного
         # увеличиваем переменную self.walkstate
-        return pg.transform.flip(self.animations['walk'][frame], bool(self.facing), False)
+        self.image = self.animations['walk'][frame]
 
     def check_controls(self, keys, events=None):  # events нужен, так как pygame крайне не любит, когда
         # много раз вызывают pg.event.get(), но ее можно не передавать, если персонаж не должен атаковать
@@ -136,8 +134,13 @@ class Hero(pg.sprite.Sprite):
     def animation(self):
         if self.current_speed['x'] < 0:  # Влево
             self.facing = 0
+            self.walk_state += 1/3
         elif self.current_speed['x'] > 0:  # Вправо
             self.facing = 1
+            self.walk_state += 1/3
+        else:
+            self.walk_state = 1
+        self.get_frame()
 
     def collided(self):
         """
