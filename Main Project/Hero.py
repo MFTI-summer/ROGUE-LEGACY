@@ -6,9 +6,11 @@ WIN_height = 500
 fps = 60
 
 
+
+
 class Hero(pg.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
         self.facing = 0  # 0 - налево, 1 - направо
@@ -30,7 +32,8 @@ class Hero(pg.sprite.Sprite):
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animation['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
-        self.rect = self.image.get_rect()
+        #self.image = self.image.subsurface((20, 20, 50, 80)) #https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
+        self.rect = self.image.get_rect(x = x, y=y)
         self.level = None
         self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
         self.isCollided = {
