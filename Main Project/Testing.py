@@ -7,6 +7,8 @@ import UI
 
 if __name__ == '__main__':
 
+    MANA_RESTORED_FOR_TICK = 2
+
     WIN_width = 750
     WIN_height = 500
 
@@ -15,16 +17,20 @@ if __name__ == '__main__':
 
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
-    heal_potion = Item.HealItem(30, 100, 100)
+    heal_potion = Item.HealItem(30, 0, 0)
+    mana_potion = Item.RestoreManaItem(50, 0, 0)
     hero = Hero.Hero(x=300, y=300)
     ui = UI.UI(hero, 5, WIN_height-5)
-    ui.heal_slot.store_item(heal_potion)
+    for _ in range(9):
+        ui.heal_slot.store_item(heal_potion)
+        ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
     level = Tiles.Level(Tiles.level_12_map)
     hero.set_level(level)
     hero.damage(30)
     while run:
+        hero.restore_mana(MANA_RESTORED_FOR_TICK/fps)
         events = pg.event.get()
         display.fill([0] * 3)
         hero.update(display, events=events)

@@ -9,6 +9,7 @@ fps = 60
 class Hero(pg.sprite.Sprite):
     MAX_HP = 100
     MAX_MANA = 100
+    MANA_FOR_SPELL = 15
 
     def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
@@ -109,7 +110,7 @@ class Hero(pg.sprite.Sprite):
         # Если персонаж может атаковать
         if events is not None:
             for event in events:
-                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.consume_mana(Hero.MANA_FOR_SPELL):
                     self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
 
@@ -205,6 +206,12 @@ class Hero(pg.sprite.Sprite):
 
     def death(self):
         pass
+
+    def consume_mana(self, mana):
+        if self.mana >= mana:
+            self.mana -= mana
+            return True
+        return False
 
     def damage(self, damage):
         self.hp -= damage
