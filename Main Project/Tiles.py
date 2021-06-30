@@ -213,6 +213,7 @@ class Level:  # Тот самый класс, ради которого писа
         self.celling = pg.sprite.Group()  # потолок
         self.walls = pg.sprite.Group()  # стены
         self.floor = pg.sprite.Group()  # пол
+        self.triangle = pg.sprite.Group()
         # Генерировать уровень
         self.generate_level(level_map)
 
