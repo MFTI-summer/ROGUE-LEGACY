@@ -6,8 +6,6 @@ WIN_height = 500
 fps = 60
 
 
-
-
 class Hero(pg.sprite.Sprite):
 
     def __init__(self, x, y):
@@ -21,19 +19,20 @@ class Hero(pg.sprite.Sprite):
         # Переменные для передвижения
         self.move_speed = {  # то, с какой скоростью герой может двигаться
             'x': 5,  # с какой скоростью герой бегает
-            'y': 7  # с какой силой герой прыгает
+            'y': 8  # с какой силой герой прыгает
         }
         self.current_speed = {
             'x': 0,
             'y': 0
         }
 
-        self.is_jump = False  # Находится ли персонаж в прыжке
+        # self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animation['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
-        #self.image = self.image.subsurface((20, 20, 50, 80)) #https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
-        self.rect = self.image.get_rect(x = x, y=y)
+        # self.image = self.image.subsurface((20, 20, 50, 80))
+        # https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
+        self.rect = self.image.get_rect(x=x, y=y)
         self.level = None
         self.intersection = lambda y1, y2, l1, l2: (y1 - y2) + l2 >= 0 if (y1 - y2) > 0 else (y1 - y2) + l1 >= 0
         self.isCollided = {
@@ -42,10 +41,13 @@ class Hero(pg.sprite.Sprite):
             'left': False,
             'right': False
         }
+        self.bullets = pg.sprite.Group()
 
-    def update(self, surface: pg.surface.Surface, level=None):
-        self.check_controls()
+    def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
+        self.check_controls(events=events)
         self.image = self.get_frame()  # просчитываем кадр анимации
+        self.bullets.update()
+        self.bullets.draw(surface)
         self.draw(surface, self.image)
 
     def draw(self, surface: pg.surface.Surface, image):
@@ -54,9 +56,10 @@ class Hero(pg.sprite.Sprite):
 
     def get_frame(self):  # Узнаем, на каком кадре находится анимация
         frame = int((self.walk_state // 3) % len(self.animation['walk']))
-        return pg.transform.flip(self.animation['walk'][frame], self.facing, 0)
+        return pg.transform.flip(self.animation['walk'][frame], bool(self.facing), False)
 
-    def check_controls(self):
+    def check_controls(self, events: pg.event.get() = None):  # events нужен, так как pygame крайне не любит, когда
+        # много раз вызывают pg.event.get(), но ее можно не передавать, если персонаж не должен атаковать
         """
         Изменяет координаты пероснажа, а также помогает с рассчетом анимации
         :return: Конкретное изображение из анимации героя
@@ -86,9 +89,19 @@ class Hero(pg.sprite.Sprite):
             self.current_speed['x'] = 0
             self.walk_state = 1
 
+        self.checkAttack(events)  # Проверяем атаку
         self.check_gravity(keys)  # Проверяем состояние прыжка
 
         self.rect.x += self.current_speed['x']
+
+    def checkAttack(self, events: pg.event.get()):
+        # Если персонаж может атаковать
+        if events is not None:
+            for event in events:
+                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
+        pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
+        print (self.bullets)
 
     def check_gravity(self, keys):
         """
@@ -151,7 +164,7 @@ class Hero(pg.sprite.Sprite):
             if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
                 # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
                 self.rect.y += WIN_height - self.rect.bottom
-                self.is_jump = False
+                self.collided['down'] = True
 
     def set_level(self, level: pg.sprite.Group):
         self.level = level
@@ -163,6 +176,21 @@ class Hero(pg.sprite.Sprite):
         """
         index = self.rect.collidelist(self.level.level.sprites())
         return index != -1
+
+
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, img_src: str, direction, startPos):
+        super().__init__()
+        img = pg.image.load(img_src)  # анимации нет, поэтому можно так загрузить картинку
+        img = img.subsurface((0, 500, 1280, 280))
+        self.direction = not direction  # так как пуля изначально смотрит вправо, мы немного схалтурим
+        self.image = pg.transform.flip(pg.transform.scale(img, [13, 5]), self.direction, 0)
+        self.rect = self.image.get_rect()
+        self.rect.center = startPos
+        self.speed = 10  # скорость по х
+
+    def update(self, *args, **kwargs) -> None:
+        self.rect.x += self.speed * (1 if self.direction == 0 else -1)
 
 
 def main():
