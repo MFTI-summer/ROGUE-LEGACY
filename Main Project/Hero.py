@@ -3,7 +3,8 @@ import pygame as pg
 WIN_width = 1000
 WIN_height = 500
 
-fps = 60
+FPS = 60
+GRAVITY = 10 / FPS
 
 
 class Hero(pg.sprite.Sprite):
@@ -17,7 +18,7 @@ class Hero(pg.sprite.Sprite):
         self.hp = Hero.MAX_HP  # хп героя
         self.mana = Hero.MAX_MANA  # мана героя
         self.facing = 0  # 0 - налево, 1 - направо
-        self.animation = {  # Тут собраны все анимации, доступные герою
+        self.animations = {  # Тут собраны все анимации, доступные герою
             'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)]  # ходьба
         }
         self.walk_state = 1  # то, в каком положении сейчас находится гг
@@ -34,7 +35,7 @@ class Hero(pg.sprite.Sprite):
         # self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
-        self.image = self.animation['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
+        self.image = self.animations['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
         # self.image = self.image.subsurface((20, 20, 50, 80))
         # https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
         self.rect = self.image.get_rect(x=x, y=y)  # располагаем героя в определенной точке пространства
@@ -51,60 +52,46 @@ class Hero(pg.sprite.Sprite):
         self.bullets = pg.sprite.Group()  # все снаряды, которые выпустил герой
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
-        self.check_controls(events=events)  # Проверяем управление
-        self.image = self.get_frame()  # просчитываем кадр анимации
-        self.bullets.update()  # Обновляем все пули в группе
-        self.bullets.draw(surface)  # отрисовываем пули
-        self.draw(surface, self.image)  # Рисуем героя на экране
+        keys = pg.key.get_pressed()
+        self.check_controls(keys, events)  # Проверяем управление
 
-    def draw(self, surface: pg.surface.Surface, image):  # Отрисовать героя на экране
+        # костылим гравитацию
+        if not self.isCollided['down']:
+            self.current_speed['y'] += GRAVITY
 
-        surface.blit(self.image, self.rect)
+        self.isCollided['down'] = False  # заново проверяем, стоим ли мы
+        self.rect.y += self.current_speed['y']
+        self.checkCollide_y()
+        self.rect.x += self.current_speed['x']
+        self.checkCollide_x()
+
+        self.animation()
+        self.draw(surface)
+
+    def draw(self, surface: pg.surface.Surface):  # Отрисовать героя на экране
+
+        surface.blit(pg.transform.flip(self.image, bool(self.facing), 0), self.rect)
 
     def get_frame(self):  # Узнаем, на каком кадре находится анимация
-        frame = int((self.walk_state // 3) % len(self.animation['walk']))  # при каждом передвижении мы немного
+        frame = int((self.walk_state // 3) % len(self.animations['walk']))  # при каждом передвижении мы немного
         # увеличиваем переменную self.walkstate
-        return pg.transform.flip(self.animation['walk'][frame], bool(self.facing), False)
+        return pg.transform.flip(self.animations['walk'][frame], bool(self.facing), False)
 
-    def check_controls(self, events: pg.event.get() = None):  # events нужен, так как pygame крайне не любит, когда
+    def check_controls(self, keys, events=None):  # events нужен, так как pygame крайне не любит, когда
         # много раз вызывают pg.event.get(), но ее можно не передавать, если персонаж не должен атаковать
         """
-        Изменяет координаты пероснажа, а также помогает с рассчетом анимации
-        :return: Конкретное изображение из анимации героя
+        Изменяет скорости пероснажа, а также помогает с рассчетом анимации
+        :return: None
         """
-        keys = pg.key.get_pressed()
-
-        if keys[pg.K_d]:  # вправо
+        if keys[pg.K_a]:
+            self.current_speed['x'] = self.move_speed['x'] * -1
+        if keys[pg.K_d]:
             self.current_speed['x'] = self.move_speed['x']
-            self.facing = 1  # поворачиваем героя лицом вправо
-            self.walk_state += 1 / 3  # продвигаем анимацию
-            walls = pg.sprite.spritecollide(self, self.level.walls_left, dokill=False)  # все стены, с которыми
-            # столкнулся гг
-            for wall in walls:
-                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):  # если гг может в них
-                    # впилиться телом
-                    self.current_speed['x'] = 0  # Останавливаемся
-
-        elif keys[pg.K_a]:  # Влево
-            self.current_speed['x'] = self.move_speed['x'] * -1  # задаем скорость (предварительно
-            self.facing = 0  # поворачиваемся Влево
-            self.walk_state += 1 / 3  # Продвигает анимацию
-            walls = pg.sprite.spritecollide(self, self.level.walls_right, dokill=False)  # стены, с которыми мы
-            # столкнулись
-            for wall in walls:
-                if self.intersection(self.rect.y, wall.rect.y, self.rect.h, wall.rect.h):  # можем ли мы напороться
-                    # на это пузом
-                    self.current_speed['x'] = 0  # Если можем, то останавливаемся
-
-
-        else:  # если мы вообще не нажали кнопку
+        if not keys[pg.K_a] and not keys[pg.K_d]:
             self.current_speed['x'] = 0
-            self.walk_state = 1
-
-        self.checkAttack(events)  # Проверяем атаку
-        self.check_gravity(keys)  # Проверяем состояние прыжка
-
-        self.rect.x += self.current_speed['x']
+        if keys[pg.K_SPACE] and self.isCollided['down']:
+            self.current_speed['y'] = self.move_speed['y'] * -1
+        self.checkAttack(events)
 
     def checkAttack(self, events: pg.event.get()):
         # Если персонаж может атаковать
@@ -114,71 +101,43 @@ class Hero(pg.sprite.Sprite):
                     self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
 
-    def check_gravity(self, keys):
-        """
-        Вообще путь должен считать довольно простенько, принимая фиксированную скрость падения,
-        чтобы всем было легко понять это движение, но я немного убитый, поэтому вот.
-        Мы посчитаем его как интеграл скорости по времени(∫υ(Δt)Δt), где dt = 1/60 секунды
-        (в принципе dt высчитывается как секунда, деленая на fps, просто у меня fps равен 60)
-        Считаем интеграл мы только для большей реалистичности прыжка (а для меня это важно)
-        :return:
-        """
-        # Вводим переменные для укорачивания записи
-        g = 10  # сила гравитации, она же ускорение свободного падения
-        dt = 1 / fps  # Диффиренциалл по времени (нужен для автоматической корриктировки точности просчета скорости
-        # при изменении fps)
+    def checkCollide_y(self):
 
-        # Да простит меня преподаватель, сопротивлением воздуха я пренебрегу, а то с тригонометрией возится - такое себе
+        for tile in self.level.level:
 
-        if keys[pg.K_SPACE] and self.isCollided['down']:
-            self.isCollided['down'] = False
-            self.current_speed['y'] = self.move_speed['y']
-        else:  # если мы уже находимся в прыжке
-            self.current_speed['y'] -= g * dt
-            self.rect.y -= self.current_speed['y']
+            if pg.sprite.collide_rect(self, tile):
 
-            if self.current_speed['y'] <= -300:  # из-за сопротивления воздуха человек не может падать быстрее
-                self.current_speed['y'] = -300  # выставляем максимальную допустимую скорость падения
+                if self.current_speed['y'] > 0:  # Если падаем
+                    if self.rect.bottom < tile.rect.top + 10:  # Если падаем на плитку сверху
+                        self.rect.bottom = tile.rect.top  # становимся на плитку
+                        self.isCollided['down'] = True  # понимаем, что мы стоим
+                        self.current_speed['y'] = 0  # перестаем падать
 
-            check_collide = self.collided()
+                elif self.current_speed['y'] < 0:  # если движемся вверх
+                    if tile not in self.level.platforms \
+                            and self.rect.top > tile.rect.bottom - 10:
+                        self.current_speed['y'] = 0
+                        self.rect.top = tile.rect.bottom
 
-            if check_collide:
-                if self.current_speed['y'] < 0:  # Если падаем
-                    platforms = pg.sprite.spritecollide(self, self.level.platforms, dokill=False)
-                    floor = pg.sprite.spritecollide(self, self.level.floor, dokill=False)
-                    for platform in platforms:
-                        # print(platform)
-                        # print(platform.rect.top, self.rect.bottom)
-                        if platform.rect.top + 10 > self.rect.bottom >= platform.rect.top:
-                            self.current_speed['y'] = 0
-                            self.isCollided['down'] = True
-                            self.rect.y += platform.rect.top - self.rect.bottom
-                            break
-                    for floor_tile in floor:
-                        if floor_tile.rect.top < self.rect.bottom < floor_tile.rect.top + 10:
-                            self.current_speed['y'] = 0
-                            self.isCollided['down'] = True
-                            self.rect.y += floor_tile.rect.top - self.rect.bottom
-                            break
-                if self.current_speed['y'] > 0:
-                    celling = pg.sprite.spritecollide(self, self.level.celling, dokill=False)
-                    for celling_tile in celling:
-                        if celling_tile.rect.bottom - 10 < self.rect.top <= celling_tile.rect.bottom:
-                            self.current_speed['y'] = 0
-                            self.rect.top += celling_tile.rect.bottom - self.rect.top
+    def checkCollide_x(self):
+        for tile in self.level.level:
+            if pg.sprite.collide_rect(self, tile) and tile not in self.level.platforms:
 
-            # if self.current_speed['y'] < 0 and collide_check[0]:
-            #     self.current_speed['y'] = 0
-            #     self.rect.bottom += self.level.level.sprites()[collide_check[1]].rect.top - self.rect.bottom
-            #     self.is_jump = False
-
-            if self.rect.bottom >= WIN_height:  # Здесь седовало бы проверять, стоит ли персонаж, но поскольку
-                # платформ нет, то проверяю столкновение с полом. этот метод будет не применим во время самой игры
-                self.rect.y += WIN_height - self.rect.bottom
-                self.isCollided['down'] = True
+                if self.current_speed['x'] < 0:  # Влево
+                    self.rect.left = tile.rect.right
+                    self.current_speed['x'] = 0
+                elif self.current_speed['x'] > 0:  # Вправо
+                    self.rect.right = tile.rect.left
+                    self.current_speed['x'] = 0
 
     def set_level(self, level: pg.sprite.Group):
         self.level = level
+
+    def animation(self):
+        if self.current_speed['x'] < 0:  # Влево
+            self.facing = 0
+        elif self.current_speed['x'] > 0:  # Вправо
+            self.facing = 1
 
     def collided(self):
         """
@@ -247,7 +206,7 @@ def main():
             if e.type == pg.QUIT:
                 return
         pg.display.update()
-        clock.tick(fps)
+        clock.tick(FPS)
 
 
 if __name__ == '__main__':
