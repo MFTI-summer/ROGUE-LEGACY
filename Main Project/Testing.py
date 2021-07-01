@@ -57,10 +57,14 @@ if __name__ == '__main__':
                     can_play = True
         for tile in hero.level.level:
             if hero.rect.bottom < tile.rect.top + 10 and can_play == True:
-                collide.play()
-                if hero.current_speed['y'] == 0:
-                    can_play = False
-                    break
+                if hero.rect.bottom > tile.rect.bottom - 10:
+                    collide.play()
+                    if hero.current_speed['y'] == 0:
+                        if hero.rect.top == tile.rect.bottom:
+                            can_play = True
+                        else:
+                             can_play = False   
+                        break
         ui.update()
         ui.display(display)
         pg.display.update()
