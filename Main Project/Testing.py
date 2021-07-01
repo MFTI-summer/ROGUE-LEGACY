@@ -4,6 +4,7 @@ import Item
 import Tiles
 import Hero
 import UI
+import Enemy
 
 pg.mixer.init()
 
