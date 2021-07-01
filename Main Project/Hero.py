@@ -6,6 +6,7 @@ WIN_height = 500
 FPS = 60
 GRAVITY = 12.4 / FPS
 
+
 class Hero(pg.sprite.Sprite):
     MAX_HP = 100
     MAX_MANA = 100
@@ -14,6 +15,8 @@ class Hero(pg.sprite.Sprite):
     def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
+        self.jumpDown = False  # Должны ли мы спрыгнуть вниз
+        self.onPlatform = False  # Стоим ли мы на полупрозрачной платформе
         self.hp = Hero.MAX_HP  # хп героя
         self.mana = Hero.MAX_MANA  # мана героя
         self.facing = 0  # 0 - налево, 1 - направо
@@ -31,7 +34,7 @@ class Hero(pg.sprite.Sprite):
             'y': 0
         }
 
-        #self.is_jump = False  # Находится ли персонаж в прыжке
+        # self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animations['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
@@ -91,7 +94,17 @@ class Hero(pg.sprite.Sprite):
             self.current_speed['x'] = 0
         if keys[pg.K_SPACE] and self.isCollided['down']:
             self.current_speed['y'] = self.move_speed['y'] * -1
+        if keys[pg.K_s]:
+            self.jumpDown = True
+        self.jump(keys, events)
         self.checkAttack(events)
+
+    def jump(self, keys, events):
+        if keys[pg.K_SPACE] and self.isCollided['down']:
+            self.current_speed['y'] = self.move_speed['y'] * -1
+        for event in events:
+            if event.type == pg.KEYDOWN and event.key == pg.K_s:  # Спрыгнуть вниз c платформы
+                self.jumpDown = True
 
     def checkAttack(self, events: pg.event.get()):
         # Если персонаж может атаковать
@@ -101,7 +114,7 @@ class Hero(pg.sprite.Sprite):
                     self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
 
-    def checkCollide_y(self):
+    def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
         for tile in self.level.level:
 
@@ -109,16 +122,21 @@ class Hero(pg.sprite.Sprite):
 
                 if self.current_speed['y'] > 0:  # Если падаем
                     if self.rect.bottom < tile.rect.top + 10:  # Если падаем на плитку сверху
-                        self.rect.bottom = tile.rect.top  # становимся на плитку
-                        self.isCollided['down'] = True  # понимаем, что мы стоим
-                        self.current_speed['y'] = 0  # перестаем падать
+                        if tile in self.level.platforms and self.jumpDown:
+                            pass
+                        else:
+                            self.rect.bottom = tile.rect.top  # становимся на плитку
+                            self.current_speed['y'] = 0  # перестаем падать
+                            self.isCollided['down'] = True
+                    else:
+                        self.jumpDown = False # Если мы уже упали с платформы   
 
                 elif self.current_speed['y'] < 0:  # если движемся вверх
                     if tile not in self.level.platforms \
                             and self.rect.top > tile.rect.bottom - 10:
                         self.current_speed['y'] = 0
                         self.rect.top = tile.rect.bottom
-                        
+
     def checkCollide_x(self):
         for tile in self.level.level:
             if pg.sprite.collide_rect(self, tile) and tile not in self.level.platforms:
@@ -134,8 +152,8 @@ class Hero(pg.sprite.Sprite):
         self.level = level
 
     def animation(self):
-        if self.current_speed['x'] < 0:  # Влево
-            self.facing = 0
+        if self.current_speed['x'] < 0:  # Если идем влево
+            self.facing = 0  # Разворачиваем
             self.walk_state += 1 / 3
         elif self.current_speed['x'] > 0:  # Вправо
             self.facing = 1
@@ -188,7 +206,6 @@ class Bullet(pg.sprite.Sprite):
 
     def update(self) -> None:
         self.rect.x += self.speed * (1 if self.direction == 0 else -1)
-
 
 
 def main():
