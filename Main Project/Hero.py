@@ -6,7 +6,6 @@ WIN_height = 500
 FPS = 60
 GRAVITY = 10 / FPS
 
-
 class Hero(pg.sprite.Sprite):
     MAX_HP = 100
     MAX_MANA = 100
@@ -32,7 +31,7 @@ class Hero(pg.sprite.Sprite):
             'y': 0
         }
 
-        # self.is_jump = False  # Находится ли персонаж в прыжке
+        #self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animations['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
@@ -118,7 +117,7 @@ class Hero(pg.sprite.Sprite):
                             and self.rect.top > tile.rect.bottom - 10:
                         self.current_speed['y'] = 0
                         self.rect.top = tile.rect.bottom
-
+                        
     def checkCollide_x(self):
         for tile in self.level.level:
             if pg.sprite.collide_rect(self, tile) and tile not in self.level.platforms:
