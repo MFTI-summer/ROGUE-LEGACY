@@ -246,11 +246,14 @@ class Bullet(pg.sprite.Sprite):
 class Sword(pg.sprite.Sprite):
     def __init__(self, start_pos, *groups):
         super().__init__(*groups)
-        temporal_image = pg.image.load('Animations/Hero/Sword/S1.jpg')  # Пока сам меч не анимируется как картинка
+        temporal_image = pg.image.load('Animations/Hero/Sword/sword.png')  # Пока сам меч не анимируется как картинка
         temporal_image = pg.transform.rotate(temporal_image, 45)
-        self.image = pg.transform.scale(temporal_image, (60, 60)).set_colorkey([255] * 3)
-        self.rect = self.image.get_rect()
-        self.rect.center = start_pos
+        self.image = pg.transform.scale(temporal_image, (60, 60)).convert_alpha()
+        # self.image.set_colorkey([255] * 3)
+        self.rot_image = self.image.copy()
+        self.rect = self.image.get_rect(center = start_pos )
+        self.rot_rect = self.rect.copy()
+
         self.anim_properties = {
             'length': 0.5 * FPS,  # Максимальная продолжительность атаки
             'currentState': 0,  # Сколько времени с момента начала атаки уже прошло (в кадрах)
@@ -266,10 +269,12 @@ class Sword(pg.sprite.Sprite):
 
     def animation(self):
         self.anim_properties['currentState'] += 1
-        self.image = pg.transform.rotate(self.image, self.anim_properties['angleSpeed'])
+
+        self.rot_image = pg.transform.rotate(self.image, self.anim_properties['currentState'])
+        self.rot_rect.center = self.rect.center
 
     def draw(self, surface: pg.surface.Surface):
-        surface.blit(self.image, self.rect)
+        surface.blit(self.rot_image, self.rot_rect)
 
 
 def main():
