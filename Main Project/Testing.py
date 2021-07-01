@@ -16,12 +16,6 @@ if __name__ == '__main__':
 
     run = True
     fps: int = 60
-
-    walk = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
-    collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
-    shut = pg.mixer.Sound('Sounds/Sound_Hit_Enemy.ogg')
-    damage = pg.mixer.Sound('Sounds/Sound_Hit_hero.ogg')
-    can_play = True
     
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
@@ -51,20 +45,7 @@ if __name__ == '__main__':
                     ui.mana_slot.use_item()
                 if event.key == pygame.K_q:
                     ui.heal_slot.use_item()
-                if event.key == pg.K_a or event.key == pg.K_d:
-                    walk.play()
-                if event.key == pg.K_SPACE:
-                    can_play = True
-        for tile in hero.level.level:
-            if hero.rect.bottom < tile.rect.top + 10 and can_play == True:
-                if hero.rect.bottom > tile.rect.bottom - 10:
-                    collide.play()
-                    if hero.current_speed['y'] == 0:
-                        if hero.rect.top == tile.rect.bottom:
-                            can_play = True
-                        else:
-                             can_play = False   
-                        break
+        hero.sounds()
         ui.update()
         ui.display(display)
         pg.display.update()

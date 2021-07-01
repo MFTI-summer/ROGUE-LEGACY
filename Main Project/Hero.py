@@ -1,4 +1,5 @@
 import pygame as pg
+pg.mixer.init()
 
 WIN_width = 1000
 WIN_height = 500
@@ -11,6 +12,11 @@ class Hero(pg.sprite.Sprite):
     MAX_HP = 100
     MAX_MANA = 100
     MANA_FOR_SPELL = 15
+
+    walk_or_collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
+    shut = pg.mixer.Sound('Sounds/Sound_Hit_Enemy.ogg')
+    damage = pg.mixer.Sound('Sounds/Sound_Hit_hero.ogg')
+    can_play = True
 
     def __init__(self, x, y):
         # ща буит куча переменных, поэтому держись
@@ -191,7 +197,24 @@ class Hero(pg.sprite.Sprite):
         self.hp -= damage
         if self.hp < 0:
             self.death()
-
+    def sounds(self):
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_a or event.key == pg.K_d:
+                    Hero.walk_or_collide.play()
+                if event.key == pg.K_SPACE:
+                    Hero.can_play = True
+        for tile in self.level.level:
+            if self.rect.bottom < tile.rect.top + 10 and Hero.can_play == True:
+                if self.rect.bottom > tile.rect.bottom - 10:
+                    Hero.walk_or_collide.play()
+                    if self.current_speed['y'] == 0:
+                        if self.rect.top == tile.rect.bottom:
+                            Hero.can_play = True
+                        else:
+                            Hero.can_play = False   
+                        break
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, img_src: str, direction, startPos):
