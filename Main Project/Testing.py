@@ -29,7 +29,7 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    level = Tiles.Level(Tiles.level_12_map)
+    level = Tiles.Level(Tiles.choose_level())
     hero.set_level(level)
     hero.damage(30)
     while run:
