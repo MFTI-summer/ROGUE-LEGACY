@@ -5,7 +5,7 @@ import Inventory
 class UI:
     def __init__(self, hero, x, y):
         self.heal_slot = Inventory.InventorySlot(10, hero, "HP", "Textures/healing salve.png", x, y)
-        self.mana_slot = Inventory.InventorySlot(10, hero, "MANA", "Textures/mana potion.png", self.heal_slot.rect.right+15, y)
+        self.mana_slot = Inventory.InventorySlot(10, hero, "MANA", "Textures/mana potion2.png", self.heal_slot.rect.right+25, y)
         self.hero = hero
 
         self.mana_bar = pygame.Surface((1.5*hero.get_mana(), 10))
