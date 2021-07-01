@@ -1,58 +1,45 @@
 import pygame
 
+pygame.font.init()
 
-class InventorySlot:
-    def __init__(self, length, hero, type):
-        self._length = length  # Максимальная вместимость слота
-        self._buf = []  # Предметы в слоте
-        self._hero = hero
-        self._type = type  # Тип предмета
+
+class InventorySlot(pygame.sprite.Sprite):
+    f1 = pygame.font.SysFont('Arial', 30, True)
+
+    def __init__(self, length, hero, type, sprite_path, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.length = length  # Максимальная вместимость слота
+        self.buf = []  # Предметы в слоте
+        self.hero = hero
+        self.type = type  # Тип предметов
+        self.image = pygame.image.load(sprite_path)
+        self.rect = self.image.get_rect()
+        self.rect.bottomleft = (x, y)
+
+    def display(self, surface: pygame.Surface):
+        count = self.f1.render(str(self.get_number_of_stored_items()), True, (255, 0, 0))
+        surface.blit(self.image, self.rect)
+        surface.blit(count, (self.rect.right-5, self.rect.centery-5))
 
     def store_item(self, item):
-        if self._type == item.get_type():
-            if len(self._buf) < self._length:
-                self._buf.append(item)
+        if self.type == item.get_type():
+            if len(self.buf) < self.length:
+                self.buf.append(item)
             else:
                 raise Exception("NOT ENOUGH SPACE")
         else:
             raise Exception("TYPE OF ITEM IS NOT CORRECT")
 
     def use_item(self):
-        if len(self._buf) > 0:
-            self._buf.pop(0).use(self._hero)
+        if self.type == "MANA" and self.hero.get_mana() >= 100:
+            return
+        if self.type == "HP" and self.hero.get_hp() >= 100:
+            return
+        if len(self.buf) > 0:
+            self.buf.pop().use(self.hero)
 
     def get_number_of_stored_items(self):
-        return len(self._buf)
+        return len(self.buf)
 
     def get_max_inventory_load(self):
-        return self._length
-
-
-class Item(pygame.sprite.Sprite):
-    def __init__(self, type, sprite_path, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(sprite_path)
-        self.rect = self.image.get_rect()
-        self.rect.bottomleft = (x, y)
-        self._type = type
-
-    def get_type(self):
-        return self._type
-
-
-class RestoreManaItem(Item):
-    def __init__(self, mana, x, y):
-        super().__init__("MANA", "Textures/mana potion.png", x, y)
-        self._mana = mana
-
-    def use(self, hero):
-        hero.restore_mana(self._mana)
-
-
-class HealItem(Item):
-    def __init__(self, heal, x, y):
-        super().__init__("HP", "Textures/healing salve.png", x, y)
-        self._heal = heal  # Сколько восстановит
-
-    def use(self, hero):
-        hero.heal(self._heal)
+        return self.length
