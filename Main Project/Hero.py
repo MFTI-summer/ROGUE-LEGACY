@@ -39,6 +39,8 @@ class Hero(pg.sprite.Sprite):
             'x': 0,
             'y': 0
         }
+        self.attackLength = 1 * FPS  # сколько идет атака (в секунда/FPS), чтобы получить ее длительность в секундах,
+                                    # домножь на FPS
 
         # self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
@@ -116,9 +118,17 @@ class Hero(pg.sprite.Sprite):
         # Если персонаж может атаковать
         if events is not None:
             for event in events:
-                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.consume_mana(Hero.MANA_FOR_SPELL):
-                    self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 3 and self.consume_mana(Hero.MANA_FOR_SPELL):  # стреляем
+                        self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
+                    if event.button == 1:  # Атакуем "мечом", меча пока нет
+                        self.meleeAttack()  # TODO: добавить анимацию удара
+
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
+
+    def meleeAttack(self):
+        # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
+        attackField = pg.rect.Rect(self.rect.x + (self.rect.w * self.facing), self.rect.y, 20, self.rect.h)
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
@@ -135,7 +145,7 @@ class Hero(pg.sprite.Sprite):
                             self.current_speed['y'] = 0  # перестаем падать
                             self.isCollided['down'] = True
                     else:
-                        self.jumpDown = False # Если мы уже упали с платформы   
+                        self.jumpDown = False  # Если мы уже упали с платформы
 
                 elif self.current_speed['y'] < 0:  # если движемся вверх
                     if tile not in self.level.platforms \
