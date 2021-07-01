@@ -16,6 +16,7 @@ if __name__ == '__main__':
 
     run = True
     fps: int = 60
+
     
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
@@ -45,6 +46,8 @@ if __name__ == '__main__':
                     ui.mana_slot.use_item()
                 if event.key == pygame.K_q:
                     ui.heal_slot.use_item()
+                if event.key == pg.K_a or event.key == pg.K_d:
+                    hero.walk_or_collide.play()
         hero.sounds()
         ui.update()
         ui.display(display)
