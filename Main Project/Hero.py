@@ -1,4 +1,5 @@
 import pygame as pg
+
 pg.mixer.init()
 
 WIN_width = 1000
@@ -39,13 +40,12 @@ class Hero(pg.sprite.Sprite):
             'x': 0,
             'y': 0
         }
-        self.attackLength = 1 * FPS  # сколько идет атака (в секунда/FPS), чтобы получить ее длительность в секундах,
-                                    # домножь на FPS
 
         # self.is_jump = False  # Находится ли персонаж в прыжке
         # обязательные переменные
         pg.sprite.Sprite.__init__(self)  # Это необходимо для корректной работы класса
         self.image = self.animations['walk'][0]  # Пока поставим первое изображение ходьбы в качестве спокойствия
+        self.weapon = pg.sprite.GroupSingle()
         # self.image = self.image.subsurface((20, 20, 50, 80))
         # https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
         self.rect = self.image.get_rect(x=x, y=y)  # располагаем героя в определенной точке пространства
@@ -77,6 +77,7 @@ class Hero(pg.sprite.Sprite):
         # Рисуем все
         self.bullets.update()
         self.bullets.draw(surface)
+        self.weapon.update(surface)
         self.draw(surface)
 
     def draw(self, surface: pg.surface.Surface):  # Отрисовать героя на экране
@@ -128,7 +129,8 @@ class Hero(pg.sprite.Sprite):
 
     def meleeAttack(self):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
-        attackField = pg.rect.Rect(self.rect.x + (self.rect.w * self.facing), self.rect.y, 20, self.rect.h)
+        # attackField = pg.rect.Rect(self.rect.x + (self.rect.w * self.facing), self.rect.y, 20, self.rect.h)
+        self.weapon.add(Sword(self.rect.center))
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
@@ -207,6 +209,7 @@ class Hero(pg.sprite.Sprite):
         self.hp -= damage
         if self.hp < 0:
             self.death()
+
     def sounds(self):
         events = pg.event.get()
         for event in events:
@@ -223,8 +226,9 @@ class Hero(pg.sprite.Sprite):
                         if self.rect.top == tile.rect.bottom:
                             Hero.can_play = True
                         else:
-                            Hero.can_play = False   
+                            Hero.can_play = False
                         break
+
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, img_src: str, direction, startPos):
@@ -239,6 +243,35 @@ class Bullet(pg.sprite.Sprite):
 
     def update(self) -> None:
         self.rect.x += self.speed * (1 if self.direction == 0 else -1)
+
+
+class Sword(pg.sprite.Sprite):
+    def __init__(self, start_pos, *groups):
+        super().__init__(*groups)
+        temporal_image = pg.image.load('Animations/Hero/Sword/S1.jpg')  # Пока сам меч не анимируется как картинка
+        temporal_image = pg.transform.rotate(temporal_image, 45)
+        self.image = pg.transform.scale(temporal_image, (60, 60)).set_colorkey([255] * 3)
+        self.rect = self.image.get_rect()
+        self.rect.center = start_pos
+        self.anim_properties = {
+            'length': 0.5 * FPS,  # Максимальная продолжительность атаки
+            'currentState': 0,  # Сколько времени с момента начала атаки уже прошло (в кадрах)
+            'angleSpeed': -180/FPS  # Возможно пригодится для анимации меча
+        }
+
+    def update(self, surface):
+        if self.anim_properties['currentState'] <= self.anim_properties['length']:
+            self.animation()
+            self.draw(surface)
+        else:
+            self.kill()
+
+    def animation(self):
+        self.anim_properties['currentState'] += 1
+        self.image = pg.transform.rotate(self.image, self.anim_properties['angleSpeed'])
+
+    def draw(self, surface: pg.surface.Surface):
+        surface.blit(self.image, self.rect)
 
 
 def main():
