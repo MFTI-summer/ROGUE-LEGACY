@@ -151,7 +151,7 @@ L..<------->..I
 ===-------=====
 ===============
 """,  # 9
-    """
+
 ====|.UU.I=====
 =___№~~~~#_____
 №..............
@@ -258,7 +258,7 @@ class Level:  # Тот самый класс, ради которого писа
         'U': None,
         'G': ['Entity', 'Ghost'],  # призрачный враг, для него нет стен
         'E': ['Entity', 'onGround'],  # наземный враг
-        'e': 'EntityBorder'  # ограничители для наземных врагов
+        'e': ['EntityBorder']  # ограничители для наземных врагов
     }
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
@@ -268,6 +268,7 @@ class Level:  # Тот самый класс, ради которого писа
         # переменные для разных типов тайлов (платформа, потолок, пол и т.д.)
         self.level = pg.sprite.Group()  # Весь уровень
         self.mobs = pg.sprite.Group()  # все мобы уровня
+        self.borders = pg.sprite.Group()
         self.platforms = pg.sprite.Group()  # платформы
         self.celling = pg.sprite.Group()  # потолок
         self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
@@ -322,11 +323,12 @@ class Level:  # Тот самый класс, ради которого писа
                         x += self.step
                         continue
                     elif tile_properties[0] == 'Entity':
-                        if tile_properties == 'onGround':
-                            self.mobs.add(Enemy(x, y))
-                            print(self.mobs)
+                        if tile_properties[1] == 'onGround':
+                            Enemy(x, bottom=y + self.step + 7, groups=self.mobs)
+                        elif tile_properties[1] == 'Ghost':
+                            pass
                     elif tile_properties[0] == 'EntityBorder':
-                        pass
+                        self.borders.add(Tile('Textures/Block.png', 0, x, y))
                     else:
                         src = tile_properties[0]  # путь к изображению
                         degree = tile_properties[1]  # Градус будущего поворота
@@ -350,7 +352,10 @@ class Level:  # Тот самый класс, ради которого писа
                     x += self.step  # смещение вправо
             # спускаемся вниз
             y += self.step
-
+        for mob in self.mobs.sprites():
+            mob.set_borders(self.borders)
+        # for block in self.borders.sprites():
+        #     block.set_level(self.level)
         # Это - фон
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
@@ -398,8 +403,6 @@ class Level:  # Тот самый класс, ради которого писа
         # elif hero.current_level == 12:
         #     enemy_17 = Enemy(enemies, 50, 200, 50)
 
-
-
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -408,12 +411,8 @@ class Level:  # Тот самый класс, ради которого писа
         """
         # self.observe(surface) - тут я хотел сделать движения камеры, но не срослось
         self.level.update(surface)  # Обновляем все тайлы
+        self.mobs.draw(surface)
         self.mobs.update()
-
-    def observe(self, surface):  # тут я хотел реализовать функции камеры, но, как ты уже знаешь, не получилось
-        for sprite in self.level:
-            sprite.update(surface)
-
 
 class Tile(pg.sprite.Sprite):
     size = 50
