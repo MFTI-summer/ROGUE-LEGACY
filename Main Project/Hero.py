@@ -26,7 +26,7 @@ class Hero(pg.sprite.Sprite):
         self.can_play = True
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
-        self.current_level = 9
+        self.current_level = 6
         self.jumpDown = False  # Должны ли мы спрыгнуть вниз
         self.onPlatform = False  # Стоим ли мы на полупрозрачной платформе
         self.hp = Hero.MAX_HP  # хп героя
@@ -181,7 +181,7 @@ class Hero(pg.sprite.Sprite):
             if pg.sprite.collide_rect(self, tile):
 
                 if self.current_speed['y'] > 0:  # Если падаем
-                    if self.rect.bottom < tile.rect.top + 10:  # Если падаем на плитку сверху
+                    if self.rect.bottom < tile.rect.top + 15:  # Если падаем на плитку сверху
                         if tile in self.level.platforms and self.jumpDown:
                             pass
                         else:
@@ -212,28 +212,30 @@ class Hero(pg.sprite.Sprite):
         self.level = level
 
     def check_correct_level(self):
-        if self.rect.x > 720:
-            return True
-        elif self.rect.x < 0:
-            return True
-        else:
+
+        if -20 < self.rect.x < 720 and 0 < self.rect.y < 500 :
+            
             return False
-        if self.rect.y > 500:
-            return True
-        elif self.rect.y < 0:
-            return True
-        else:
-            return False
+
+
+        return True
+
+
+
 
     def change_level(self, level: pg.sprite.Group, side):
         if side == "right":
             self.rect.x -= 720
+            self.level = level
         elif side == "left":
             self.rect.x += 720
+            self.level = level
         elif side == "down":
             self.rect.y -= 500
-        else:
+            self.level = level
+        elif side=="up":
             self.rect.y += 500
+            self.level = level
 
     def animation(self):
         if self.current_speed['x'] < 0:  # Если идем влево
