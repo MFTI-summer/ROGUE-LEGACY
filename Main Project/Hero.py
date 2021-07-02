@@ -142,7 +142,7 @@ class Hero(pg.sprite.Sprite):
             if pg.sprite.collide_rect(self, tile):
 
                 if self.current_speed['y'] > 0:  # Если падаем
-                    if self.rect.bottom < tile.rect.top + 10:  # Если падаем на плитку сверху
+                    if self.rect.bottom < tile.rect.top + 15:  # Если падаем на плитку сверху
                         if tile in self.level.platforms and self.jumpDown:
                             pass
                         else:
