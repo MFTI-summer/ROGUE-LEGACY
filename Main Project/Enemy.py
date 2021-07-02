@@ -13,6 +13,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(groups)
 
         # координаты, на которых появляется моб
+        self.hp = 100
         self.end = end
         self.borders: pygame.sprite.Group() = None
         self.direction = 1  # влево или вправо
@@ -54,6 +55,7 @@ class Enemy(pygame.sprite.Sprite):
     def get_damage(self, gotten_damage):
         if self.health - gotten_damage <= 0:
             self.isAlive = False
+            self.kill()
         else:
             self.health -= gotten_damage
 

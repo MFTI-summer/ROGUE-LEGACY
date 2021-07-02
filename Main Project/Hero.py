@@ -60,6 +60,7 @@ class Hero(pg.sprite.Sprite):
             'right': False
         }
         self.bullets = pg.sprite.Group()  # все снаряды, которые выпустил герой
+        self.bulletDamage = 40
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
         keys = pg.key.get_pressed()
@@ -129,6 +130,15 @@ class Hero(pg.sprite.Sprite):
                         self.meleeAttack()  # TODO: добавить анимацию удара
 
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
+        bullet_damaged_mobs = pg.sprite.groupcollide(self.bullets, self.level.mobs, 1, 0)
+        if len(bullet_damaged_mobs) > 0:
+            self.damage_mobs(bulletDamaged=bullet_damaged_mobs)
+
+    def damage_mobs(self, bulletDamaged: dict = None, swordDamaged=None):
+        print (bulletDamaged.values())
+        for mob in bulletDamaged.values():
+            print (mob)
+            mob[0].get_damage(self.bulletDamage)
 
     def meleeAttack(self):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
@@ -250,7 +260,7 @@ class Hero(pg.sprite.Sprite):
                         if self.rect.top == tile.rect.bottom:
                             self.can_play = True
                         else:
-                            self.can_play = False   
+                            self.can_play = False
 
                         break
 
@@ -278,13 +288,13 @@ class Sword(pg.sprite.Sprite):
         self.image = pg.transform.scale(temporal_image, (60, 60)).convert_alpha()
         # self.image.set_colorkey([255] * 3)
         self.rot_image = self.image.copy()
-        self.rect = self.image.get_rect(center = start_pos )
+        self.rect = self.image.get_rect(center=start_pos)
         self.rot_rect = self.rect.copy()
 
         self.anim_properties = {
             'length': 0.5 * FPS,  # Максимальная продолжительность атаки
             'currentState': 0,  # Сколько времени с момента начала атаки уже прошло (в кадрах)
-            'angleSpeed': -180/FPS  # Возможно пригодится для анимации меча
+            'angleSpeed': -180 / FPS  # Возможно пригодится для анимации меча
         }
 
     def update(self, surface):
@@ -318,6 +328,7 @@ def main():
                 return
         pg.display.update()
         clock.tick(FPS)
+
 
 if __name__ == '__main__':
     main()
