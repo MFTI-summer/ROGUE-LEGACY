@@ -174,7 +174,7 @@ class Hero(pg.sprite.Sprite):
 
     def check_correct_level(self):
 
-        if 0 < self.rect.x < 720 and 0 < self.rect.y < 500 :
+        if -20 < self.rect.x < 720 and 0 < self.rect.y < 500 :
             
             return False
 
@@ -194,7 +194,7 @@ class Hero(pg.sprite.Sprite):
         elif side == "down":
             self.rect.y -= 500
             self.level = level
-        else:
+        elif side=="up":
             self.rect.y += 500
             self.level = level
 
