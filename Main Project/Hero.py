@@ -19,7 +19,7 @@ class Hero(pg.sprite.Sprite):
     def __init__(self, x, y):
 
         self.weaponRect = None
-        self.swordDamage = 70
+        self.swordDamage = 20
         self.walk_or_collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
         self.shut = pg.mixer.Sound('Sounds/Shut.wav')
         self.hit = pg.mixer.Sound('Sounds/Sound_Hit_Hero.ogg')

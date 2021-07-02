@@ -4,6 +4,8 @@ from random import randint as ri
 window_widht = 1000
 window_height = 500
 
+FPS = 60
+
 
 class Enemy(pygame.sprite.Sprite):
     walkRight = [pygame.image.load(f'Animations/Enemy/R{i}E.png') for i in range(1, 11 + 1)]
@@ -16,6 +18,10 @@ class Enemy(pygame.sprite.Sprite):
         self.hp = 100
         self.end = end
         self.damage = 10
+        self.immortality = {
+            'now': 0,
+            'max': 0.5 * FPS
+        }
         self.borders: pygame.sprite.Group() = None
         self.direction = 1  # влево или вправо
         self.walkCount = 0  # нужно для корректной отрисовки анимации
@@ -57,8 +63,12 @@ class Enemy(pygame.sprite.Sprite):
         if self.health - gotten_damage <= 0:
             self.isAlive = False
             self.kill()
+        elif 0 < self.immortality['now'] < self.immortality['max']:
+            self.immortality['now'] += 1
         else:
+            self.immortality['now'] = 0
             self.health -= gotten_damage
+
 
     def attack(self):
         pass
