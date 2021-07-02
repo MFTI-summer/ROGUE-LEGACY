@@ -28,7 +28,7 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    current_level=5
+    current_level = 5
 
     level = Tiles.Level(Tiles.levels[current_level])
     hero.set_level(level)
@@ -39,19 +39,19 @@ if __name__ == '__main__':
         display.fill([0] * 3)
         hero.update(display, events=events)
         if hero.check_correct_level():
-            if hero.rect.x > 720 and current_level not in [3,7,11]:
-                current_level+=1
+            if hero.rect.x > 720 and current_level not in [3, 7, 11]:
+                current_level += 1
                 level = Tiles.Level(Tiles.levels[current_level])
                 hero.change_level((level), "right")
-            elif hero.rect.x < 0 and current_level not in [0,4,8]:
-                    current_level -= 1
-                    level = Tiles.Level(Tiles.levels[current_level])
-                    hero.change_level((level), "left")
-            if hero.rect.y > 500 and current_level not in [8, 9, 10,11]:
+            elif hero.rect.x < 0 and current_level not in [0, 4, 8]:
+                current_level -= 1
+                level = Tiles.Level(Tiles.levels[current_level])
+                hero.change_level((level), "left")
+            if hero.rect.top > WIN_height and current_level not in [8, 9, 10, 11]:
                 current_level += 4
                 level = Tiles.Level(Tiles.levels[current_level])
                 hero.change_level((level), "down")
-            elif hero.rect.y < 0 and current_level not in [0,1,2,3]:
+            elif hero.rect.bottom < 0 and current_level not in [0, 1, 2, 3]:
                 current_level -= 4
                 level = Tiles.Level(Tiles.levels[current_level])
                 hero.change_level((level, "up"))

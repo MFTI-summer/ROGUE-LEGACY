@@ -173,18 +173,16 @@ class Hero(pg.sprite.Sprite):
         self.level = level
 
     def check_correct_level(self):
-        if self.rect.x > 720:
-            return True
-        elif self.rect.x < 0:
-            return True
-        else:
+
+        if 0 < self.rect.x < 720 and 0 < self.rect.y < 500 :
+            
             return False
-        if self.rect.y > 500:
-            return True
-        elif self.rect.y < 0:
-            return True
-        else:
-            return False
+
+
+        return True
+
+
+
 
     def change_level(self, level: pg.sprite.Group, side):
         if side == "right":
@@ -254,7 +252,7 @@ class Hero(pg.sprite.Sprite):
                         if self.rect.top == tile.rect.bottom:
                             self.can_play = True
                         else:
-                            self.can_play = False   
+                            self.can_play = False
 
                         break
 
@@ -282,13 +280,13 @@ class Sword(pg.sprite.Sprite):
         self.image = pg.transform.scale(temporal_image, (60, 60)).convert_alpha()
         # self.image.set_colorkey([255] * 3)
         self.rot_image = self.image.copy()
-        self.rect = self.image.get_rect(center = start_pos )
+        self.rect = self.image.get_rect(center=start_pos)
         self.rot_rect = self.rect.copy()
 
         self.anim_properties = {
             'length': 0.5 * FPS,  # Максимальная продолжительность атаки
             'currentState': 0,  # Сколько времени с момента начала атаки уже прошло (в кадрах)
-            'angleSpeed': -180/FPS  # Возможно пригодится для анимации меча
+            'angleSpeed': -180 / FPS  # Возможно пригодится для анимации меча
         }
 
     def update(self, surface):
@@ -322,6 +320,7 @@ def main():
                 return
         pg.display.update()
         clock.tick(FPS)
+
 
 if __name__ == '__main__':
     main()
