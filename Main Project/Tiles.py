@@ -413,7 +413,6 @@ class Level:  # Тот самый класс, ради которого писа
         # self.observe(surface) - тут я хотел сделать движения камеры, но не срослось
         self.level.update(surface)  # Обновляем все тайлы
         self.mobs.draw(surface)
-        print(self.mobs)
         self.mobs.update()
 
 class Tile(pg.sprite.Sprite):
