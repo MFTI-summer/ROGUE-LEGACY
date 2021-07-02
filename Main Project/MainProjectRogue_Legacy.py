@@ -21,19 +21,19 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
     heal_potion = Item.HealItem(30)
     mana_potion = Item.RestoreManaItem(50)
-    hero = Hero.Hero(x=400, y=200)
+    hero = Hero.Hero(x=400, y=150)
     ui = UI.UI(hero, 5, WIN_height - 5)
     for _ in range(10):
         ui.heal_slot.store_item(heal_potion)
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    current_level = 7
+    current_level = 9
 
 
     level = Tiles.Level(Tiles.levels[current_level])
     hero.set_level(level)
-    hero.damage(30)
+    hero.get_damage(30)
     while run:
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()

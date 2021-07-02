@@ -64,7 +64,10 @@ class Hero(pg.sprite.Sprite):
         }
         self.bullets = pg.sprite.Group()  # все снаряды, которые выпустил герой
         self.bulletDamage = 40  # Урон от пуль
-        self.immortalTime = 100  # время бессмертия после урона в кадрах
+        self.immortalTime = {
+            'max': 1 * FPS,
+            'current': 0
+        }  # время бессмертия после урона в кадрах
         self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS)
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
@@ -83,6 +86,7 @@ class Hero(pg.sprite.Sprite):
         # Делаем анимацию
         self.animation()
         # Рисуем все
+        self.check_damage()
         self.bullets.update()
         self.bullets.draw(surface)
         self.weapon.update(surface)
@@ -151,7 +155,15 @@ class Hero(pg.sprite.Sprite):
                 pass
 
     def check_damage(self):
-        pass
+        sprite = pg.sprite.spritecollideany(self, self.level.mobs)
+        if sprite is not None:
+            if self.immortalTime['current'] == 0:
+                self.get_damage(sprite.damage)
+                self.immortalTime['current'] = 1
+        if self.immortalTime['current'] > 0:
+            self.immortalTime['current'] += 1
+            if self.immortalTime['current'] >= self.immortalTime['max']:
+                self.immortalTime['current'] = 0
 
     def meleeAttack(self):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
@@ -170,7 +182,7 @@ class Hero(pg.sprite.Sprite):
                 self.attackProperties['isAttacking'] = False
         mobRects = {mob: mob.rect for mob in self.level.mobs}
         for mob in mobRects:
-            print (mob)
+            print(mob)
             if self.weaponRect.colliderect(mobRects[mob]):
                 mob.get_damage(self.swordDamage)
 
@@ -213,15 +225,10 @@ class Hero(pg.sprite.Sprite):
 
     def check_correct_level(self):
 
-        if -20 < self.rect.x < 720 and 0 < self.rect.y < 500 :
-            
+        if -20 < self.rect.x < 720 and 0 < self.rect.y < 500:
             return False
 
-
         return True
-
-
-
 
     def change_level(self, level: pg.sprite.Group, side):
         if side == "right":
@@ -233,7 +240,7 @@ class Hero(pg.sprite.Sprite):
         elif side == "down":
             self.rect.y -= 500
             self.level = level
-        elif side=="up":
+        elif side == "up":
             self.rect.y += 500
             self.level = level
 
@@ -273,7 +280,7 @@ class Hero(pg.sprite.Sprite):
             return True
         return False
 
-    def damage(self, damage):
+    def get_damage(self, damage):
         self.hp -= damage
         if self.hp < 0:
             self.death()

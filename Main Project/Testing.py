@@ -35,7 +35,7 @@ if __name__ == '__main__':
     level = Tiles.Level(lvl.replace(' ', ''))
 
     hero.set_level(level)
-    hero.damage(30)
+    hero.get_damage(30)
     while run:
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()

@@ -15,6 +15,7 @@ class Enemy(pygame.sprite.Sprite):
         # координаты, на которых появляется моб
         self.hp = 100
         self.end = end
+        self.damage = 10
         self.borders: pygame.sprite.Group() = None
         self.direction = 1  # влево или вправо
         self.walkCount = 0  # нужно для корректной отрисовки анимации
