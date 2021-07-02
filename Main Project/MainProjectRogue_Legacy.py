@@ -28,7 +28,7 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    current_level = 4
+    current_level = 5
 
 
     level = Tiles.Level(Tiles.levels[current_level])
