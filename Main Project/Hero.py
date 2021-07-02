@@ -23,7 +23,7 @@ class Hero(pg.sprite.Sprite):
         self.can_play = True
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
-        self.current_level = 1
+        self.current_level =1
         self.jumpDown = False  # Должны ли мы спрыгнуть вниз
         self.onPlatform = False  # Стоим ли мы на полупрозрачной платформе
         self.hp = Hero.MAX_HP  # хп героя
@@ -171,6 +171,29 @@ class Hero(pg.sprite.Sprite):
     def set_level(self, level: pg.sprite.Group):
         self.level = level
 
+    def check_correct_level(self):
+        if self.rect.x > 720:
+            return True
+        elif self.rect.x < 0:
+            return True
+        else:
+            return False
+        if self.rect.y > 500:
+            return True
+        elif self.rect.y < 0:
+            return True
+        else:
+            return False
+
+    def change_level(self, level: pg.sprite.Group, side):
+        if side == "right":
+            self.rect.x -= 720
+        elif side == "left":
+            self.rect.x += 720
+        elif side == "down":
+            self.rect.y -= 500
+        else:
+            self.rect.y += 500
     def animation(self):
         if self.current_speed['x'] < 0:  # Если идем влево
             self.facing = 0  # Разворачиваем
