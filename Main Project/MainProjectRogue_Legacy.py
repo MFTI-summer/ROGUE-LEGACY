@@ -28,7 +28,7 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    current_level=6
+    current_level=5
 
     level = Tiles.Level(Tiles.levels[current_level])
     hero.set_level(level)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
-        hero.update(display, events=events)
+        hero.update(display, events=eve   nts)
         if hero.check_correct_level():
             if hero.rect.x > 720 and current_level not in [3,7,11]:
                 current_level+=1

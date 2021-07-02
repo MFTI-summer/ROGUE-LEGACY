@@ -189,12 +189,16 @@ class Hero(pg.sprite.Sprite):
     def change_level(self, level: pg.sprite.Group, side):
         if side == "right":
             self.rect.x -= 720
+            self.level = level
         elif side == "left":
             self.rect.x += 720
+            self.level = level
         elif side == "down":
             self.rect.y -= 500
+            self.level = level
         else:
             self.rect.y += 500
+            self.level = level
 
     def animation(self):
         if self.current_speed['x'] < 0:  # Если идем влево
