@@ -33,7 +33,8 @@ class Hero(pg.sprite.Sprite):
         self.mana = Hero.MAX_MANA  # мана героя
         self.facing = 0  # 0 - налево, 1 - направо
         self.animations = {  # Тут собраны все анимации, доступные герою
-            'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)]  # ходьба
+            'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)],  # ходьба
+            'jump':0
         }
         self.walk_state = 1  # то, в каком положении сейчас находится гг
         # Переменные для передвижения
