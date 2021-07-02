@@ -1,4 +1,5 @@
 import pygame as pg
+import Enemy
 
 pg.init()
 pg.mixer.init()
@@ -60,7 +61,8 @@ class Hero(pg.sprite.Sprite):
             'right': False
         }
         self.bullets = pg.sprite.Group()  # все снаряды, которые выпустил герой
-        self.bulletDamage = 40
+        self.bulletDamage = 40  # Урон от пуль
+        self.immortalTime = 100  # время бессмертия после урона в кадрах
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
         keys = pg.key.get_pressed()
@@ -135,10 +137,17 @@ class Hero(pg.sprite.Sprite):
             self.damage_mobs(bulletDamaged=bullet_damaged_mobs)
 
     def damage_mobs(self, bulletDamaged: dict = None, swordDamaged=None):
-        print (bulletDamaged.values())
-        for mob in bulletDamaged.values():
-            print (mob)
-            mob[0].get_damage(self.bulletDamage)
+        if bulletDamaged is not None:
+            for mob in bulletDamaged.values():
+                if type(mob[0]) is not Enemy.Ghost:
+                    mob[0].get_damage(self.bulletDamage)
+        if swordDamaged is not None:
+            for mob in swordDamaged:
+                pass
+
+
+    def check_damage(self):
+        pass
 
     def meleeAttack(self):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
