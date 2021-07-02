@@ -41,41 +41,12 @@ class Enemy(pygame.sprite.Sprite):
         idx = (self.walkCount % (len(self.walkRight) * 3)) // 3
         if self.vel < 0:  # Влево
             self.image = self.walkLeft[idx]
-        elif self.vel > 0: # вправо
+        elif self.vel > 0:  # Вправо
             self.image = self.walkRight[idx]
-    # def animation(self):
-    #     self.move()
-    #     if self.isAlive:  # отрисовка персонажа, при условии, что тот жив
-    #         if self.walkCount + 1 >= 33:
-    #             self.walkCount = 0
-    #
-    #         if self.vel > 0:
-    #             self.image = self.walkRight[self.walkCount // 3]
-    #             # win.blit(, (self.x, self.y))
-    #             self.walkCount += 1
-    #         else:
-    #             self.image = self.walkLeft[self.walkCount // 3]
-    #             # win.blit(self.walkLeft[self.walkCount //3], (self.x, self.y))
-    #             self.walkCount += 1
-    #
-    # def move(self):  # движение персонажа по заданной траектории
-    #     if self.vel > 0:
-    #         if self.rect.x + self.vel < self.path[1]:
-    #             self.rect.x += self.vel
-    #         else:
-    #             self.vel = self.vel * -1
-    #             self.walkCount = 0
-    #     else:
-    #         if self.rect.x - self.vel > self.path[0]:
-    #             self.rect.x += self.vel
-    #         else:
-    #             self.vel = self.vel * -1
-    #             self.walkCount = 0
 
     def collide_x(self):
         if pygame.sprite.spritecollideany(self, self.borders) is not None:
             return True
-
 
     def set_borders(self, borders):
         self.borders = borders
