@@ -355,8 +355,6 @@ class Level:  # Тот самый класс, ради которого писа
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
 
-<<<<<<< Updated upstream
-=======
         if hero.current_level == 1:
             enemies = pg.sprite.Group()
             enemy_1 = Enemy(20, 450, 250)
@@ -413,8 +411,6 @@ class Level:  # Тот самый класс, ради которого писа
             enemies = pg.sprite.Group()
             enemy_17 = Enemy(50, 200, 50)
             enemies.add(enemy_17)
-
->>>>>>> Stashed changes
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -480,16 +476,16 @@ def change_level():
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
     global screen
-<<<<<<< Updated upstream
+
     hero = Hero.Hero(x=100, y=100)
     # change_level()
     lvl = levels[hero.current_level]
     generator = Level(lvl.replace(' ', ''))
-=======
+
     hero = Hero.Hero()
     change_level()
     generator = Level(hero.current_level.replace(' ', ''))
->>>>>>> Stashed changes
+
     generator.update(screen)
     while 1:
 
