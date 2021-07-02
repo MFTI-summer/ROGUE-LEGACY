@@ -5,6 +5,7 @@ import Tiles
 import Hero
 import UI
 import Enemy
+
 pg.init()
 pg.mixer.init()
 
@@ -18,27 +19,33 @@ if __name__ == '__main__':
     run = True
     fps: int = 60
 
-    
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
     heal_potion = Item.HealItem(30)
     mana_potion = Item.RestoreManaItem(50)
     hero = Hero.Hero(x=300, y=300)
-    ui = UI.UI(hero, 5, WIN_height-5)
+    ui = UI.UI(hero, 5, WIN_height - 5)
     for _ in range(10):
         ui.heal_slot.store_item(heal_potion)
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
+<<<<<<< Updated upstream
     lvl = Tiles.levels[hero.current_level]
     level = Tiles.Level(lvl.replace(' ', ''))
+=======
+    level = Tiles.Level(Tiles.levels[hero.current_level])
+>>>>>>> Stashed changes
     hero.set_level(level)
     hero.damage(30)
     while run:
-        hero.restore_mana(MANA_RESTORED_FOR_TICK/fps)
+        hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
+<<<<<<< Updated upstream
         #enemies.draw()
+=======
+>>>>>>> Stashed changes
         hero.update(display, events=events)
         level.update(display)
         for event in events:

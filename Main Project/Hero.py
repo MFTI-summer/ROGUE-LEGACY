@@ -111,11 +111,12 @@ class Hero(pg.sprite.Sprite):
         self.checkAttack(events)
 
     def jump(self, keys, events):
-        if keys[pg.K_SPACE] and self.isCollided['down']:
-            self.current_speed['y'] = self.move_speed['y'] * -1
-        for event in events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_s:  # Спрыгнуть вниз c платформы
-                self.jumpDown = True
+        if events is not None:
+            if keys[pg.K_SPACE] and self.isCollided['down']:
+                self.current_speed['y'] = self.move_speed['y'] * -1
+            for event in events:
+                if event.type == pg.KEYDOWN and event.key == pg.K_s:  # Спрыгнуть вниз c платформы
+                    self.jumpDown = True
 
     def checkAttack(self, events: pg.event.get()):
         # Если персонаж может атаковать
@@ -279,20 +280,20 @@ class Sword(pg.sprite.Sprite):
         surface.blit(self.rot_image, self.rot_rect)
 
 
-# def main():
-#     display = pg.display.set_mode((WIN_width, WIN_height))
-#     clock = pg.time.Clock()
-#     hero = Hero()
-#     while 1:
-#         display.fill([255] * 3)
-#
-#         hero.update(display)
-#
-#         for e in pg.event.get():
-#             if e.type == pg.QUIT:
-#                 return
-#         pg.display.update()
-#         clock.tick(FPS)
-#
-# if __name__ == '__main__':
-#     main()
+def main():
+    display = pg.display.set_mode((WIN_width, WIN_height))
+    clock = pg.time.Clock()
+    hero = Hero(100, 100)
+    while 1:
+        display.fill([255] * 3)
+
+        hero.update(display)
+
+        for e in pg.event.get():
+            if e.type == pg.QUIT:
+                return
+        pg.display.update()
+        clock.tick(FPS)
+
+if __name__ == '__main__':
+    main()
