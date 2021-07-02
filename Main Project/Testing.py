@@ -30,22 +30,19 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-<<<<<<< Updated upstream
     lvl = Tiles.levels[hero.current_level]
     level = Tiles.Level(lvl.replace(' ', ''))
-=======
+
     level = Tiles.Level(Tiles.levels[hero.current_level])
->>>>>>> Stashed changes
+
     hero.set_level(level)
     hero.damage(30)
     while run:
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
-<<<<<<< Updated upstream
         #enemies.draw()
-=======
->>>>>>> Stashed changes
+
         hero.update(display, events=events)
         level.update(display)
         for event in events:
