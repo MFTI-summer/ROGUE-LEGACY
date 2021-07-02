@@ -277,6 +277,7 @@ class Level:  # Тот самый класс, ради которого писа
         self.triangle = pg.sprite.Group()
         # Генерировать уровень
         self.generate_level(level_map)
+        self.borders
 
     def generate_level(self, level_map: str):
         # это документация к функции, с ней тоже можно ознакомиться
@@ -354,6 +355,8 @@ class Level:  # Тот самый класс, ради которого писа
             y += self.step
         for mob in self.mobs.sprites():
             mob.set_borders(self.borders)
+        # for block in self.borders.sprites():
+        #     block.set_level(self.level)
         # Это - фон
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))

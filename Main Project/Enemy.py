@@ -14,7 +14,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # координаты, на которых появляется моб
         self.end = end
-        self.level = None
+        self.boarders: pygame.sprite.Group() = None
         self.direction = 1  # влево или вправо
         self.walkCount = 0  # нужно для корректной отрисовки анимации
         self.image = self.walkRight[self.walkCount // 3]
@@ -60,12 +60,11 @@ class Enemy(pygame.sprite.Sprite):
                 self.walkCount = 0
 
     def collide_x(self):
-        if pygame.sprite.spritecollideany(self, self.level.borders):
-            pass
+        return pygame.sprite.spritecollideany(self, self.boarders)
 
-    def set_borders(self, level):
-        self.level = level
-
+    def set_borders(self, borders):
+        self.boarders = borders
+        print(borders)
 
     def get_damage(self, gotten_damage):
         if self.health - gotten_damage <= 0:
@@ -81,7 +80,9 @@ class Ghost(Enemy):
     def __init__(self, x, bottom, end=400):
         super(Ghost, self).__init__(x, bottom, end=end)
 
+
 enemys = pygame.sprite.Group()
+
 
 def main():
     display = pygame.display.set_mode((window_widht, window_height))
