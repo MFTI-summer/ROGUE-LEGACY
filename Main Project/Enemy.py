@@ -15,12 +15,11 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(groups)
 
         # координаты, на которых появляется моб
-        self.hp = 100
         self.end = end
         self.damage = 10
         self.immortality = {
             'now': 0,
-            'max': 0.5 * FPS
+            'max': 0.2 * FPS
         }
         self.borders: pygame.sprite.Group() = None
         self.direction = 1  # влево или вправо
@@ -60,14 +59,17 @@ class Enemy(pygame.sprite.Sprite):
         self.borders = borders
 
     def get_damage(self, gotten_damage):
-        if self.health - gotten_damage <= 0:
-            self.isAlive = False
-            self.kill()
-        elif 0 < self.immortality['now'] < self.immortality['max']:
+        print (self.immortality['now'])
+        if self.immortality['now'] is 0:
+            self.health -= gotten_damage
+            print (self.health, ' health')
+            self.immortality['now'] = 1
+            if self.health <= 0:
+                self.kill()
+        elif 1 <= self.immortality['now'] < self.immortality['max']:
             self.immortality['now'] += 1
         else:
             self.immortality['now'] = 0
-            self.health -= gotten_damage
 
 
     def attack(self):

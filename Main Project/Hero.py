@@ -19,7 +19,7 @@ class Hero(pg.sprite.Sprite):
     def __init__(self, x, y):
 
         self.weaponRect = None
-        self.swordDamage = 20
+        self.swordDamage = 34
         self.walk_or_collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
         self.shut = pg.mixer.Sound('Sounds/Shut.wav')
         self.hit = pg.mixer.Sound('Sounds/Sound_Hit_Hero.ogg')
@@ -68,7 +68,7 @@ class Hero(pg.sprite.Sprite):
             'max': 1 * FPS,
             'current': 0
         }  # время бессмертия после урона в кадрах
-        self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS)
+        self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS, couldown = 1*FPS)
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
         keys = pg.key.get_pressed()
@@ -185,6 +185,7 @@ class Hero(pg.sprite.Sprite):
             print(mob)
             if self.weaponRect.colliderect(mobRects[mob]):
                 mob.get_damage(self.swordDamage)
+                print ('hp -', mob.health)
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
@@ -200,6 +201,7 @@ class Hero(pg.sprite.Sprite):
                             self.rect.bottom = tile.rect.top  # становимся на плитку
                             self.current_speed['y'] = 0  # перестаем падать
                             self.isCollided['down'] = True
+                            self.jumpDown = False
                     else:
                         self.jumpDown = False  # Если мы уже упали с платформы
 
