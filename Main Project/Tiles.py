@@ -267,7 +267,7 @@ class Level:  # Тот самый класс, ради которого писа
         self.step = Tile.size  # Задаем размер шага
         # переменные для разных типов тайлов (платформа, потолок, пол и т.д.)
         self.level = pg.sprite.Group()  # Весь уровень
-        self.mobs = pg.sprite.Group  # все мобы уровня
+        self.mobs = pg.sprite.Group()  # все мобы уровня
         self.platforms = pg.sprite.Group()  # платформы
         self.celling = pg.sprite.Group()  # потолок
         self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
@@ -355,66 +355,51 @@ class Level:  # Тот самый класс, ради которого писа
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
 
-<<<<<<< Updated upstream
-=======
+        enemies = pg.sprite.Group()
         if hero.current_level == 1:
-            enemies = pg.sprite.Group()
-            enemy_1 = Enemy(20, 450, 250)
-            enemies.add(enemy_1)
-        elif hero.current_level == 2:
-            enemies = pg.sprite.Group()
-            enemy_2 = Enemy(30, 150, 250)
-            enemies.add(enemy_2)
-        elif hero.current_level == 3:
-            enemies = pg.sprite.Group()
-            enemy_3 = Enemy(20, 250, 250)
-            enemy_4 = Enemy(20, 250, 300)
-        elif hero.current_level == 4:
-            enemies = pg.sprite.Group()
-            enemy_5 = Enemy(20, 400, 300)
-            enemies.add(enemy_5)
-        elif hero.current_level == 5:
-            enemies = pg.sprite.Group()
-            enemy_6 = Enemy(20, 450, 50)
-            enemy_7 = Enemy(20, 450, 500)
-            enemies.add(enemy_6)
-            enemies.add(enemy_7)
-        elif hero.current_level == 6:
-            enemies = pg.sprite.Group()
-            enemy_8 = Enemy(20, 200, 50)
-            enemy_9 = Enemy(20, 450, 450)
-            enemies.add(enemy_8)
-            enemies.add(enemy_9)
-        elif hero.current_level == 7:
-            enemies = pg.sprite.Group()
-            enemy_10 = Enemy(20, 450, 250)
-            enemy_11 = Enemy(20, 50, 400)
-            enemies.add(enemy_10)
-            enemies.add(enemy_11)
-        elif hero.current_level == 8:
-            enemies = pg.sprite.Group()
-            enemy_12 = Enemy(20, 200, 150)
-            enemies.add(enemy_12)
-        elif hero.current_level == 9:
-            enemies = pg.sprite.Group()
-            enemy_13 = Enemy(20, 250, 450)
-            enemies.add(enemy_13)
-        elif hero.current_level == 10:
-            enemies = pg.sprite.Group()
-            enemy_14 = Enemy(30, 150, 0)
-            enemy_15 = Enemy(30, 150, 450)
-            enemies.add(enemy_14)
-            enemies.add(enemy_15)
-        elif hero.current_level == 11:
-            enemies = pg.sprite.Group()
-            enemy_16 = Enemy(40, 250, 50)
-            enemies.add(enemy_16)
-        elif hero.current_level == 12:
-            enemies = pg.sprite.Group()
-            enemy_17 = Enemy(50, 200, 50)
-            enemies.add(enemy_17)
+            enemy_1 = Enemy(enemies, 20, 450, 250)
 
->>>>>>> Stashed changes
+        elif hero.current_level == 2:
+            enemy_2 = Enemy(enemies, 30, 150, 250)
+
+        elif hero.current_level == 3:
+            enemy_3 = Enemy(enemies, 20, 250, 250)
+            enemy_4 = Enemy(enemies, 20, 250, 300)
+
+        elif hero.current_level == 4:
+            enemy_5 = Enemy(enemies, 20, 400, 300)
+
+        elif hero.current_level == 5:
+            enemy_6 = Enemy(enemies, 20, 450, 50)
+            enemy_7 = Enemy(enemies, 20, 450, 500)
+
+        elif hero.current_level == 6:
+            enemy_8 = Enemy(enemies, 20, 200, 50)
+            enemy_9 = Enemy(enemies, 20, 450, 450)
+
+        elif hero.current_level == 7:
+            enemy_10 = Enemy(enemies, 20, 450, 250)
+            enemy_11 = Enemy(enemies, 20, 50, 400)
+
+        elif hero.current_level == 8:
+            enemy_12 = Enemy(enemies, 20, 200, 150)
+
+        elif hero.current_level == 9:
+            pass
+            #enemy_13 = Enemy(enemies, 20, 250, 450)
+
+        elif hero.current_level == 10:
+            enemy_14 = Enemy(enemies, 30, 150, 0)
+            enemy_15 = Enemy(enemies, 30, 150, 450)
+
+        elif hero.current_level == 11:
+            enemy_16 = Enemy(enemies, 40, 250, 50)
+
+        elif hero.current_level == 12:
+            enemy_17 = Enemy(enemies, 50, 200, 50)
+
+
+
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -480,16 +465,12 @@ def change_level():
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
     global screen
-<<<<<<< Updated upstream
+
     hero = Hero.Hero(x=100, y=100)
     # change_level()
     lvl = levels[hero.current_level]
     generator = Level(lvl.replace(' ', ''))
-=======
-    hero = Hero.Hero()
-    change_level()
-    generator = Level(hero.current_level.replace(' ', ''))
->>>>>>> Stashed changes
+
     generator.update(screen)
     while 1:
 
