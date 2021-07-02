@@ -37,7 +37,7 @@ if __name__ == '__main__':
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
-        hero.update(display, events=eve   nts)
+        hero.update(display, events=events)
         if hero.check_correct_level():
             if hero.rect.x > 720 and current_level not in [3,7,11]:
                 current_level+=1
