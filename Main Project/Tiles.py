@@ -155,9 +155,9 @@ __№.......<-,==
 .......UU......
 [[[[[)...([[[[[
 ...............
-.E.........E...
-[[[[[)...([[[[[
-L.......~.....R
+eE...e...e.E..e
+[[[[[)~~~([[[[[
+L.............R
 L.............R
 ----->~~~<-----
 _____№...#_____
@@ -258,7 +258,7 @@ class Level:  # Тот самый класс, ради которого писа
         'U': None,
         'G': ['Entity', 'Ghost'],  # призрачный враг, для него нет стен
         'E': ['Entity', 'onGround'],  # наземный враг
-        'e': 'EntityBorder'  # ограничители для наземных врагов
+        'e': ['EntityBorder']  # ограничители для наземных врагов
     }
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
@@ -268,6 +268,7 @@ class Level:  # Тот самый класс, ради которого писа
         # переменные для разных типов тайлов (платформа, потолок, пол и т.д.)
         self.level = pg.sprite.Group()  # Весь уровень
         self.mobs = pg.sprite.Group()  # все мобы уровня
+        self.borders = pg.sprite.Group()
         self.platforms = pg.sprite.Group()  # платформы
         self.celling = pg.sprite.Group()  # потолок
         self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
@@ -322,11 +323,12 @@ class Level:  # Тот самый класс, ради которого писа
                         x += self.step
                         continue
                     elif tile_properties[0] == 'Entity':
-                        if tile_properties == 'onGround':
-                            self.mobs.add(Enemy(x, y))
-                            print(self.mobs)
+                        if tile_properties[1] == 'onGround':
+                            Enemy(x, bottom=y + self.step + 7, groups=self.mobs)
+                        elif tile_properties[1] == 'Ghost':
+                            pass
                     elif tile_properties[0] == 'EntityBorder':
-                        pass
+                        self.borders.add(Tile('Textures/Block.png', 0, x, y))
                     else:
                         src = tile_properties[0]  # путь к изображению
                         degree = tile_properties[1]  # Градус будущего поворота
@@ -350,55 +352,54 @@ class Level:  # Тот самый класс, ради которого писа
                     x += self.step  # смещение вправо
             # спускаемся вниз
             y += self.step
-
+        for mob in self.mobs.sprites():
+            mob.set_borders(self.borders)
         # Это - фон
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
 
         enemies = pg.sprite.Group()
-        if hero.current_level == 1:
-            enemy_1 = Enemy(enemies, 20, 450, 250)
-
-        elif hero.current_level == 2:
-            enemy_2 = Enemy(enemies, 30, 150, 250)
-
-        elif hero.current_level == 3:
-            enemy_3 = Enemy(enemies, 20, 250, 250)
-            enemy_4 = Enemy(enemies, 20, 250, 300)
-
-        elif hero.current_level == 4:
-            enemy_5 = Enemy(enemies, 20, 400, 300)
-
-        elif hero.current_level == 5:
-            enemy_6 = Enemy(enemies, 20, 450, 50)
-            enemy_7 = Enemy(enemies, 20, 450, 500)
-
-        elif hero.current_level == 6:
-            enemy_8 = Enemy(enemies, 20, 200, 50)
-            enemy_9 = Enemy(enemies, 20, 450, 450)
-
-        elif hero.current_level == 7:
-            enemy_10 = Enemy(enemies, 20, 450, 250)
-            enemy_11 = Enemy(enemies, 20, 50, 400)
-
-        elif hero.current_level == 8:
-            enemy_12 = Enemy(enemies, 20, 200, 150)
-
-        elif hero.current_level == 9:
-            pass
-            #enemy_13 = Enemy(enemies, 20, 250, 450)
-
-        elif hero.current_level == 10:
-            enemy_14 = Enemy(enemies, 30, 150, 0)
-            enemy_15 = Enemy(enemies, 30, 150, 450)
-
-        elif hero.current_level == 11:
-            enemy_16 = Enemy(enemies, 40, 250, 50)
-
-        elif hero.current_level == 12:
-            enemy_17 = Enemy(enemies, 50, 200, 50)
-
-
+        # if hero.current_level == 1:
+        #     enemy_1 = Enemy(enemies, 20, 450, 250)
+        #
+        # elif hero.current_level == 2:
+        #     enemy_2 = Enemy(enemies, 30, 150, 250)
+        #
+        # elif hero.current_level == 3:
+        #     enemy_3 = Enemy(enemies, 20, 250, 250)
+        #     enemy_4 = Enemy(enemies, 20, 250, 300)
+        #
+        # elif hero.current_level == 4:
+        #     enemy_5 = Enemy(enemies, 20, 400, 300)
+        #
+        # elif hero.current_level == 5:
+        #     enemy_6 = Enemy(enemies, 20, 450, 50)
+        #     enemy_7 = Enemy(enemies, 20, 450, 500)
+        #
+        # elif hero.current_level == 6:
+        #     enemy_8 = Enemy(enemies, 20, 200, 50)
+        #     enemy_9 = Enemy(enemies, 20, 450, 450)
+        #
+        # elif hero.current_level == 7:
+        #     enemy_10 = Enemy(enemies, 20, 450, 250)
+        #     enemy_11 = Enemy(enemies, 20, 50, 400)
+        #
+        # elif hero.current_level == 8:
+        #     enemy_12 = Enemy(enemies, 20, 200, 150)
+        #
+        # elif hero.current_level == 9:
+        #     pass
+        #     #enemy_13 = Enemy(enemies, 20, 250, 450)
+        #
+        # elif hero.current_level == 10:
+        #     enemy_14 = Enemy(enemies, 30, 150, 0)
+        #     enemy_15 = Enemy(enemies, 30, 150, 450)
+        #
+        # elif hero.current_level == 11:
+        #     enemy_16 = Enemy(enemies, 40, 250, 50)
+        #
+        # elif hero.current_level == 12:
+        #     enemy_17 = Enemy(enemies, 50, 200, 50)
 
     def update(self, surface):
         """
@@ -408,12 +409,9 @@ class Level:  # Тот самый класс, ради которого писа
         """
         # self.observe(surface) - тут я хотел сделать движения камеры, но не срослось
         self.level.update(surface)  # Обновляем все тайлы
+        self.mobs.draw(surface)
+        print(self.mobs)
         self.mobs.update()
-
-    def observe(self, surface):  # тут я хотел реализовать функции камеры, но, как ты уже знаешь, не получилось
-        for sprite in self.level:
-            sprite.update(surface)
-
 
 class Tile(pg.sprite.Sprite):
     size = 50

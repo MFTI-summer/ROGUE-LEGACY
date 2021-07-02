@@ -23,7 +23,7 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
     heal_potion = Item.HealItem(30)
     mana_potion = Item.RestoreManaItem(50)
-    hero = Hero.Hero(x=300, y=300)
+    hero = Hero.Hero(x=300, y=200)
     ui = UI.UI(hero, 5, WIN_height - 5)
     for _ in range(10):
         ui.heal_slot.store_item(heal_potion)

@@ -9,14 +9,16 @@ class Enemy(pygame.sprite.Sprite):
     walkRight = [pygame.image.load(f'Animations/Enemy/R{i}E.png') for i in range(1, 11 + 1)]
     walkLeft = [pygame.image.load(f'Animations/Enemy/L{i}E.png') for i in range(1, 11 + 1)]
 
-    def __init__(self, x, y, end=400, groups=None):
+    def __init__(self, x, bottom, groups, end=400):
         super().__init__(groups)
 
         # координаты, на которых появляется моб
         self.end = end
+        self.level = None
+        self.direction = 1  # влево или вправо
         self.walkCount = 0  # нужно для корректной отрисовки анимации
         self.image = self.walkRight[self.walkCount // 3]
-        self.rect = self.image.get_rect(x=x, y=y)
+        self.rect = self.image.get_rect(x=x, y=bottom - 64)
         self.path = [self.rect.x, self.end]  # та траектория, по которой он гуляет
         self.vel = 3  # скорость
         # self.hitbox = (self.x + 17, self.y + 2, 31, 57) #размеры его хитбокса(я пытался их максимально подогнать к рамерам текстуры)
@@ -57,6 +59,14 @@ class Enemy(pygame.sprite.Sprite):
                 self.vel = self.vel * -1
                 self.walkCount = 0
 
+    def collide_x(self):
+        if pygame.sprite.spritecollideany(self, self.level.borders):
+            pass
+
+    def set_borders(self, level):
+        self.level = level
+
+
     def get_damage(self, gotten_damage):
         if self.health - gotten_damage <= 0:
             self.isAlive = False
@@ -68,19 +78,17 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Ghost(Enemy):
-    def __init__(self, x, y, end=400):
-        super(Ghost, self).__init__(x, y, end=end)
-
+    def __init__(self, x, bottom, end=400):
+        super(Ghost, self).__init__(x, bottom, end=end)
 
 enemys = pygame.sprite.Group()
-
 
 def main():
     display = pygame.display.set_mode((window_widht, window_height))
     clock = pygame.time.Clock()
     run = True
     for _ in range(5):
-        Enemy(groups=enemys, x=20, y=ri(0, 450), end=400)
+        Enemy(groups=enemys, x=20, bottom=ri(0, 450), end=400)
 
     while run:
         display.fill([255] * 3)
