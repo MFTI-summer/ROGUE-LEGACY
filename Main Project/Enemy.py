@@ -9,7 +9,7 @@ class Enemy(pygame.sprite.Sprite):
     walkRight = [pygame.image.load('Animations/Enemy/R1E.png'), pygame.image.load('Animations/Enemy/R2E.png'), pygame.image.load('Animations/Enemy/R3E.png'), pygame.image.load('Animations/Enemy/R4E.png'), pygame.image.load('Animations/Enemy/R5E.png'), pygame.image.load('Animations/Enemy/R6E.png'), pygame.image.load('Animations/Enemy/R7E.png'), pygame.image.load('Animations/Enemy/R8E.png'), pygame.image.load('Animations/Enemy/R9E.png'), pygame.image.load('Animations/Enemy/R10E.png'), pygame.image.load('Animations/Enemy/R11E.png')]
     walkLeft = [pygame.image.load('Animations/Enemy/L1E.png'), pygame.image.load('Animations/Enemy/L2E.png'), pygame.image.load('Animations/Enemy/L3E.png'), pygame.image.load('Animations/Enemy/L4E.png'), pygame.image.load('Animations/Enemy/L5E.png'), pygame.image.load('Animations/Enemy/L6E.png'), pygame.image.load('Animations/Enemy/L7E.png'), pygame.image.load('Animations/Enemy/L8E.png'), pygame.image.load('Animations/Enemy/L9E.png'), pygame.image.load('Animations/Enemy/L10E.png'), pygame.image.load('Animations/Enemy/L11E.png')]
 
-    def __init__(self, groups, x, y, end):
+    def __init__(self, groups, x, y, end=400):
         super().__init__(groups)
 
 

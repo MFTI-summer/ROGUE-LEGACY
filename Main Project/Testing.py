@@ -30,14 +30,15 @@ if __name__ == '__main__':
         ui.mana_slot.store_item(mana_potion)
     # hero.rect.x = 300
     # hero.rect.y = 300
-    level = Tiles.Level(hero.current_level.replace(' ', ''))
+    lvl = Tiles.levels[hero.current_level]
+    level = Tiles.Level(lvl.replace(' ', ''))
     hero.set_level(level)
     hero.damage(30)
     while run:
         hero.restore_mana(MANA_RESTORED_FOR_TICK/fps)
         events = pg.event.get()
         display.fill([0] * 3)
-        enemies.draw()
+        #enemies.draw()
         hero.update(display, events=events)
         level.update(display)
         for event in events:
