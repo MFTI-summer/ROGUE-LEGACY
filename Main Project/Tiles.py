@@ -2,7 +2,8 @@ import pygame as pg
 import random
 import Hero
 import Enemy
-#import Hero
+
+# import Hero
 # ПРОЧИТАЙ, ВАЖНО!!! Как тут оставить документацию к пакету? А, да пофиг, просто коммент захреначу. Чтобы работать с
 # этим модулем, тебе лучше ознакомиться с исходным кодом Вот тебе кратенко обо всем, что тут происходит. Во-первых,
 # я писал комментарии второпях и в них наверняка есть ошибки, но мне пофиг Во-вторых, если ты запустишь файл,
@@ -150,7 +151,7 @@ __№.......<-,==
 .....~~~~~#____
 ...............
 """,
-"""            
+    """            
 .......UU......
 [[[[[)...([[[[[
 ...............
@@ -162,7 +163,7 @@ L.............R
 _____№...#_____
 ...............
 """,
-"""
+    """
 .....#____'=|UU
 ..........№-#..
 ...............
@@ -174,7 +175,7 @@ L........~~...R
 ____№....([[___
 ...............
 """,
-"""
+    """
 UU.....#___'===
 ...........I===
 >..........I===
@@ -189,20 +190,26 @@ L..............
 # Очень важно, чтобы кол-во символов в ряду совпадало (хотя генератор от этого не сломается
 # но выглядеть будет лучше. Точки обозначают пустое место, поэтому можно все дозаполнить ими
 # Cоставление списка только из плиток. Нужен для перехода на следующий уровень
-hero = Hero()
+hero = Hero.Hero(100, 100)
+
 
 def levels_change(sprite):
-    if all_tiles[hero.rect.x//50-1][hero.rect.y//50-1] == 'L' or all_tiles[hero.rect.x//50-1][hero.rect.y//50-1] == 'U':
+    if all_tiles[hero.rect.x // 50 - 1][hero.rect.y // 50 - 1] == 'L' or all_tiles[hero.rect.x // 50 - 1][
+        hero.rect.y // 50 - 1] == 'U':
         hero.current_level -= 1
-    elif all_tiles[hero.rect.x//50-1][hero.rect.y//50-1] == 'R' or all_tiles[hero.rect.x//50-1][hero.rect.y//50-1] == 'D':
+    elif all_tiles[hero.rect.x // 50 - 1][hero.rect.y // 50 - 1] == 'R' or all_tiles[hero.rect.x // 50 - 1][
+        hero.rect.y // 50 - 1] == 'D':
         hero.current_level += 1
+
+
 for i in range(0, len(levels)):
-    for j in range(0, len(levels[i])-levels[i].count(' ')-levels[i].count('\n')):
+    for j in range(0, len(levels[i]) - levels[i].count(' ') - levels[i].count('\n')):
         if levels[i][j] != '\n' and levels[i][j] != ' ':
             all_tiles[i].append(levels[i][j])
 
 print(levels, '=', len(levels))
 print(all_tiles, '=', len(all_tiles))
+
 
 class Level:  # Тот самый класс, ради которого писался весь код
     # Тут размещается словарь с символами и значениями, которые этим символам присваиваются
@@ -363,8 +370,8 @@ class Level:  # Тот самый класс, ради которого писа
             enemies.add(enemy_9)
         elif hero.current_level == 7:
             enemies = pg.Sprite.Group()
-            enemy_10 = Enemy(20,450,250)
-            enemy_11 = Enemy(20,50,400)
+            enemy_10 = Enemy(20, 450, 250)
+            enemy_11 = Enemy(20, 50, 400)
             enemies.add(enemy_10)
             enemies.add(enemy_11)
         elif hero.current_level == 8:
@@ -373,7 +380,7 @@ class Level:  # Тот самый класс, ради которого писа
             enemies.add(enemy_12)
         elif hero.current_level == 9:
             enemies = pg.Sprite.Group()
-            enemy_13 = Enemy(20, 250,450)
+            enemy_13 = Enemy(20, 250, 450)
             enemies.add(enemy_13)
         elif hero.current_level == 10:
             enemies = pg.Sprite.Group()

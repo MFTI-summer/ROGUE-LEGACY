@@ -5,7 +5,7 @@ import Tiles
 import Hero
 import UI
 import Enemy
-
+pg.init()
 pg.mixer.init()
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import pygame as pg
 
+pg.init()
 pg.mixer.init()
 
 WIN_width = 1000
@@ -278,21 +279,20 @@ class Sword(pg.sprite.Sprite):
         surface.blit(self.rot_image, self.rot_rect)
 
 
-def main():
-    display = pg.display.set_mode((WIN_width, WIN_height))
-    clock = pg.time.Clock()
-    hero = Hero()
-    while 1:
-        display.fill([255] * 3)
-
-        hero.update(display)
-
-        for e in pg.event.get():
-            if e.type == pg.QUIT:
-                return
-        pg.display.update()
-        clock.tick(FPS)
-
-pass
-if __name__ == '__main__':
-    main()
+# def main():
+#     display = pg.display.set_mode((WIN_width, WIN_height))
+#     clock = pg.time.Clock()
+#     hero = Hero()
+#     while 1:
+#         display.fill([255] * 3)
+#
+#         hero.update(display)
+#
+#         for e in pg.event.get():
+#             if e.type == pg.QUIT:
+#                 return
+#         pg.display.update()
+#         clock.tick(FPS)
+#
+# if __name__ == '__main__':
+#     main()
