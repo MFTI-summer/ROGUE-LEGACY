@@ -18,6 +18,8 @@ class Hero(pg.sprite.Sprite):
 
     def __init__(self, x, y):
 
+        self.weaponRect = None
+        self.swordDamage = 70
         self.walk_or_collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
         self.shut = pg.mixer.Sound('Sounds/Shut.wav')
         self.hit = pg.mixer.Sound('Sounds/Sound_Hit_Hero.ogg')
@@ -63,6 +65,7 @@ class Hero(pg.sprite.Sprite):
         self.bullets = pg.sprite.Group()  # все снаряды, которые выпустил герой
         self.bulletDamage = 40  # Урон от пуль
         self.immortalTime = 100  # время бессмертия после урона в кадрах
+        self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS)
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
         keys = pg.key.get_pressed()
@@ -130,6 +133,8 @@ class Hero(pg.sprite.Sprite):
                         self.bullets.add(Bullet('Animations/Hero/Bullets/bullet1.png', self.facing, self.rect.center))
                     if event.button == 1:  # Атакуем "мечом", меча пока нет
                         self.meleeAttack()  # TODO: добавить анимацию удара
+        if self.attackProperties['isAttacking']:
+            self.meleeAttack()
 
         pg.sprite.groupcollide(self.bullets, self.level.level, True, False)
         bullet_damaged_mobs = pg.sprite.groupcollide(self.bullets, self.level.mobs, 1, 0)
@@ -145,14 +150,29 @@ class Hero(pg.sprite.Sprite):
             for mob in swordDamaged:
                 pass
 
-
     def check_damage(self):
         pass
 
     def meleeAttack(self):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
         # attackField = pg.rect.Rect(self.rect.x + (self.rect.w * self.facing), self.rect.y, 20, self.rect.h)
-        self.weapon.add(Sword(self.rect.center))
+        if not self.attackProperties['isAttacking']:
+            left = self.rect.x + self.rect.w if self.facing is 1 else self.rect.x - self.rect.w
+            top = self.rect.y
+            width = 30
+            height = self.rect.h
+            self.weaponRect = pg.rect.Rect(left, top, width, height)
+            self.attackProperties['isAttacking'] = True
+        else:
+            self.attackProperties['attackState'] += 1
+            if self.attackProperties['attackState'] == self.attackProperties['attackMaxLength']:
+                self.attackProperties['attackState'] = False
+                self.attackProperties['isAttacking'] = False
+        mobRects = {mob: mob.rect for mob in self.level.mobs}
+        for mob in mobRects:
+            print (mob)
+            if self.weaponRect.colliderect(mobRects[mob]):
+                mob.get_damage(self.swordDamage)
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
