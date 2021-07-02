@@ -1,7 +1,7 @@
 import pygame as pg
 import random
 import Hero
-from Enemy import Enemy
+from Enemy import *
 
 # import Hero
 # ПРОЧИТАЙ, ВАЖНО!!! Как тут оставить документацию к пакету? А, да пофиг, просто коммент захреначу. Чтобы работать с
@@ -155,7 +155,7 @@ __№.......<-,==
 .......UU......
 [[[[[)...([[[[[
 ...............
-...............
+.E.........E...
 [[[[[)...([[[[[
 L.......~.....R
 L.............R
@@ -256,6 +256,9 @@ class Level:  # Тот самый класс, ради которого писа
         'L': None,
         'D': None,
         'U': None,
+        'G': ['Entity', 'Ghost'],  # призрачный враг, для него нет стен
+        'E': ['Entity', 'onGround'],  # наземный враг
+        'e': 'EntityBorder'  # ограничители для наземных врагов
     }
 
     def __init__(self, level_map):  # self.step нужен, чтобы определить размер шага, потом увидишь где это понадобится
@@ -264,6 +267,7 @@ class Level:  # Тот самый класс, ради которого писа
         self.step = Tile.size  # Задаем размер шага
         # переменные для разных типов тайлов (платформа, потолок, пол и т.д.)
         self.level = pg.sprite.Group()  # Весь уровень
+        self.mobs = pg.sprite.Group  # все мобы уровня
         self.platforms = pg.sprite.Group()  # платформы
         self.celling = pg.sprite.Group()  # потолок
         self.walls_left = pg.sprite.Group()  # Стены, смотрящие влево
@@ -317,17 +321,26 @@ class Level:  # Тот самый класс, ради которого писа
                         # генератор дальше)
                         x += self.step
                         continue
-                    src = tile_properties[0]  # путь к изображению
-                    degree = tile_properties[1]  # Градус будущего поворота
-                    tile = Tile(src, degree, x, y)
-                    self.level.add(tile)  # добавляем новую плитку к уже имеющимся
+                    elif tile_properties[0] == 'Entity':
+                        if tile_properties == 'onGround':
+                            self.mobs.add(Enemy(x, y))
+                            print(self.mobs)
+                    elif tile_properties[0] == 'EntityBorder':
+                        pass
+                    else:
+                        src = tile_properties[0]  # путь к изображению
+                        degree = tile_properties[1]  # Градус будущего поворота
+                        tile = Tile(src, degree, x, y)
+                        self.level.add(tile)  # добавляем новую плитку к уже имеющимся
 
-                    for group in tile_properties[2:]:
-                        if group is not None:
-                            exec(f'self.{group}.add(tile)')
+                        for group in tile_properties[2:]:
+                            if group is not None:
+                                exec(f'self.{group}.add(tile)')
 
                     x += self.step  # смещаемся вправо на ширину одной плитки
                 # Это добавление плиток для платформ
+                # TODO Добавить спавн врагов при помощи генератора
+
                 else:
                     platform = Platform(x, y)  # так как платформа добавляется в несоколько групп, то ее нужно
                     # занести в отдельную переменную, иначе мы будем добавлять 2 разные платформы
@@ -342,59 +355,6 @@ class Level:  # Тот самый класс, ради которого писа
         bg = pg.image.load("Textures/background_750x500.png").convert()
         screen.blit(bg, (0, 0))
 
-        if hero.current_level == 1:
-            enemies = pg.sprite.Group()
-            enemy_1 = Enemy(enemies, 20, 450, 250)
-
-        elif hero.current_level == 2:
-            enemies = pg.Sprite.Group()
-            enemy_2 = Enemy(enemies, 30, 150, 250)
-
-        elif hero.current_level == 3:
-            enemies = pg.Sprite.Group()
-            enemy_3 = Enemy(enemies, 20, 250, 250)
-            enemy_4 = Enemy(enemies, 20, 250, 300)
-        elif hero.current_level == 4:
-            enemies = pg.Sprite.Group()
-            enemy_5 = Enemy(enemies, 20, 400, 300)
-
-        elif hero.current_level == 5:
-            enemies = pg.Sprite.Group()
-            enemy_6 = Enemy(enemies, 20, 450, 50)
-            enemy_7 = Enemy(enemies, 20, 450, 500)
-
-        elif hero.current_level == 6:
-            enemies = pg.Sprite.Group()
-            enemy_8 = Enemy(enemies, 20, 200, 50)
-            enemy_9 = Enemy(enemies, 20, 450, 450)
-
-        elif hero.current_level == 7:
-            enemies = pg.Sprite.Group()
-            enemy_10 = Enemy(enemies, 20, 450, 250)
-            enemy_11 = Enemy(enemies, 20, 50, 400)
-
-        elif hero.current_level == 8:
-            enemies = pg.Sprite.Group()
-            enemy_12 = Enemy(enemies, 20, 200, 150)
-
-        elif hero.current_level == 9:
-            enemies = pg.Sprite.Group()
-            enemy_13 = Enemy(enemies, 20, 250, 450)
-
-        elif hero.current_level == 10:
-            enemies = pg.Sprite.Group()
-            enemy_14 = Enemy(enemies, 30, 150, 0)
-            enemy_15 = Enemy(enemies, 30, 150, 450)
-
-        elif hero.current_level == 11:
-            enemies = pg.Sprite.Group()
-            enemy_16 = Enemy(enemies, 40, 250, 50)
-
-        elif hero.current_level == 12:
-            enemies = pg.Sprite.Group()
-            enemy_17 = Enemy(enemies, 50, 200, 50)
-
-
     def update(self, surface):
         """
         Если что-то изменилось, следует обновить весь уровень
@@ -403,6 +363,7 @@ class Level:  # Тот самый класс, ради которого писа
         """
         # self.observe(surface) - тут я хотел сделать движения камеры, но не срослось
         self.level.update(surface)  # Обновляем все тайлы
+        self.mobs.update()
 
     def observe(self, surface):  # тут я хотел реализовать функции камеры, но, как ты уже знаешь, не получилось
         for sprite in self.level:
@@ -434,18 +395,6 @@ class Tile(pg.sprite.Sprite):
         """
         surface.blit(self.image, self.rect)  # тут все понятно
 
-    def move(self):  # Тут я пытался заставить плитки двигаться, но не получилось
-        keys = pg.key.get_pressed()
-        if keys[pg.K_w]:
-            self.rect.y += self.speed
-        if keys[pg.K_s]:
-            self.rect.y -= self.speed
-        if keys[pg.K_a]:
-            self.rect.x += self.speed
-        if keys[pg.K_d]:
-            self.rect.x -= self.speed
-        self.update()
-
     def change_size(self, multiplier: None, new_size: tuple = None):
         if multiplier is None:
             self.image = pg.transform.scale(self.image, new_size)
@@ -467,8 +416,8 @@ class Platform(Tile):
 def main():  # Если модуль все же запустили как приложение, то выполняется простенькая программа
     # Думаю, что пояснений к ней не требуется
     global screen
-    hero = Hero.Hero(x = 100, y = 100)
-    #change_level()
+    hero = Hero.Hero(x=100, y=100)
+    # change_level()
     lvl = levels[hero.current_level]
     generator = Level(lvl.replace(' ', ''))
     generator.update(screen)

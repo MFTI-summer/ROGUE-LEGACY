@@ -23,7 +23,7 @@ class Hero(pg.sprite.Sprite):
         self.can_play = True
         # ща буит куча переменных, поэтому держись
         # Необходимые для анимации переменные
-        self.current_level = 1
+        self.current_level = 9
         self.jumpDown = False  # Должны ли мы спрыгнуть вниз
         self.onPlatform = False  # Стоим ли мы на полупрозрачной платформе
         self.hp = Hero.MAX_HP  # хп героя
