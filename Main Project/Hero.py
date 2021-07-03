@@ -79,7 +79,10 @@ class Hero(pg.sprite.Sprite):
             'max': 1 * FPS,
             'current': 0
         }  # время бессмертия после урона в кадрах
-        self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS, couldown=1 * FPS)
+
+        self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS, couldown = 1*FPS)
+        self.isAlive=True
+
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
         print("*"*20)
@@ -317,7 +320,8 @@ class Hero(pg.sprite.Sprite):
         return self.mana
 
     def death(self):
-        pass
+        self.isAlive=False
+        print("YOU ARE DEAD")
 
     def consume_mana(self, mana):
         if self.mana >= mana:

@@ -31,11 +31,12 @@ if __name__ == '__main__':
     # hero.rect.x = 300
     # hero.rect.y = 300
     current_level = 0
+    isAlive=True
 
     level = Tiles.Level(Tiles.levels[current_level])
     hero.set_level(level)
     hero.get_damage(30)
-    while run:
+    while run and hero.isAlive:
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
@@ -58,8 +59,6 @@ if __name__ == '__main__':
                 current_level -= 4
                 level = Tiles.Level(Tiles.levels[current_level])
                 hero.change_level((level), "up")
-        print(hero.rect.x, hero.rect.y, current_level)
-
         level.update(display)
         for event in events:
             if event.type == pg.QUIT:
