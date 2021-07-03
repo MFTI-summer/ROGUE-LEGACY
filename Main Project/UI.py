@@ -21,8 +21,10 @@ class UI:
     def update(self):
         self.mana_bar = pygame.Surface((1.5*self.hero.get_mana(), 10))
         self.mana_bar.fill((0, 0, 255))
-
-        self.hp_bar = pygame.Surface((1.5*self.hero.get_hp(), 10))
+        try:
+            self.hp_bar = pygame.Surface((1.5*self.hero.get_hp(), 10))
+        except:
+            pass
         self.hp_bar.fill((255, 0, 0))
 
     def display(self, surface: pygame.Surface):
