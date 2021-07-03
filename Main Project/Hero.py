@@ -85,23 +85,18 @@ class Hero(pg.sprite.Sprite):
 
 
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
-        print("*"*20)
 
         keys = pg.key.get_pressed()
         self.check_controls(keys, events)  # Проверяем управление
 
-        print ("self.isCollided['down']", self.isCollided['down'])
         # костылим гравитацию
         # if not self.isCollided['down']:
         self.current_speed['y'] += GRAVITY
 
         self.isCollided['down'] = False  # заново проверяем, стоим ли мы
 
-        print("round(self.current_speed['y'])  ", self.current_speed['y'], ceil(self.current_speed['y']))
-
         self.rect.y += ceil(self.current_speed['y'])
         self.checkCollide_y()
-        print ("self.isCollided['down']", self.isCollided['down'])
 
         self.rect.x += self.current_speed['x']
         self.checkCollide_x()
@@ -167,7 +162,7 @@ class Hero(pg.sprite.Sprite):
             for mob in bulletDamaged.values():
                 if type(mob[0]) is not Enemy.Ghost:
                     mob[0].get_damage(self.bulletDamage)
-                    print(mob[0].health)
+
 
     def check_damage(self):
         sprite = pg.sprite.spritecollideany(self, self.level.mobs)
@@ -198,20 +193,14 @@ class Hero(pg.sprite.Sprite):
                 self.attackProperties['isAttacking'] = False
         mobRects = {mob: mob.rect for mob in self.level.mobs}
         for mob in mobRects:
-            print(mob)
             if self.weaponRect.colliderect(mobRects[mob]):
                 mob.get_damage(self.swordDamage)
-                print('hp -', mob.health)
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
-
-        print("CollideAny",pg.sprite.spritecollideany(self, self.level.level, collided = None))
-        print(f"rect.y {self.rect.y}, bottom {self.rect.bottom}, speed {self.current_speed['y']}")
 
         for tile in self.level.level:
 
             if tile.rect.colliderect(self.rect):
-                print(f"203 строка =={self.rect.bottom}=={tile.rect.top}==={self.current_speed['y']}==========================")
 
                 if self.current_speed['y'] > 0:  # Если падаем
                     if self.rect.bottom < tile.rect.top + 15:  # Если падаем на плитку сверху
@@ -267,13 +256,10 @@ class Hero(pg.sprite.Sprite):
             self.level = level
 
     def animation(self):
-        print ('\n', self.current_speed['y'])
-        print (self.isCollided['down'])
         if self.current_speed['y'] != 0 and not self.isCollided['down']:
             if self.current_speed['y'] < 0:  # Если подлетаем
                 self.currentAnimation = 'jump'
                 self.animations['count'] += self.dframe['jump']
-                print(self.animations['count'])
             elif self.current_speed['y'] > 0:  # Если падаем
                 self.currentAnimation = 'fall'
         else:
@@ -295,12 +281,9 @@ class Hero(pg.sprite.Sprite):
             self.currentAnimation = 'attack'
             self.animations['count'] += self.dframe['attack']
         self.set_frame()
-        print(self.animations['count'])
 
     def set_frame(self):  # Узнаем, на каком кадре находится анимация
         frame = int((self.animations['count'] // 1) % len(self.animations[self.currentAnimation]))
-        print(frame)
-        print(self.currentAnimation)
         self.image = self.animations[self.currentAnimation][frame]
 
     def heal(self, hp):
