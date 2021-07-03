@@ -17,6 +17,8 @@ if __name__ == '__main__':
     run = True
     fps: int = 60
 
+    bg = pygame.image.load('Textures/background_750x500.png')
+
     display = pg.display.set_mode((WIN_width, WIN_height))
     clock = pg.time.Clock()
     heal_potion = Item.HealItem(30)
@@ -38,6 +40,7 @@ if __name__ == '__main__':
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
         display.fill([0] * 3)
+        display.blit(bg, bg.get_rect())
         hero.update(display, events=events)
         if hero.check_correct_level():
             if hero.rect.x > 720 and current_level not in [3, 7, 11]:
