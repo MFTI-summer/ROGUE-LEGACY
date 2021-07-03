@@ -1,5 +1,6 @@
 import pygame as pg
 import Enemy
+from math import ceil
 
 pg.init()
 pg.mixer.init()
@@ -17,7 +18,11 @@ class Hero(pg.sprite.Sprite):
     MANA_FOR_SPELL = 15
 
     def __init__(self, x, y):
-
+        self.dframe = {
+            'jump': 1 / 20,
+            'walk': 1 / 7,
+            'attack': 1 / 5
+        }  # скорость смены кадров
         self.weaponRect = None
         self.swordDamage = 34
         self.walk_or_collide = pg.mixer.Sound('Sounds/Sound_collide_and_walk.wav')
@@ -31,9 +36,14 @@ class Hero(pg.sprite.Sprite):
         self.onPlatform = False  # Стоим ли мы на полупрозрачной платформе
         self.hp = Hero.MAX_HP  # хп героя
         self.mana = Hero.MAX_MANA  # мана героя
-        self.facing = 0  # 0 - налево, 1 - направо
+        self.facing = 0  # 0 - направо, 1 - налево
         self.animations = {  # Тут собраны все анимации, доступные герою
-            'walk': [pg.image.load(f'Animations/Hero/Walk/L{frame}.png') for frame in range(1, 9)]  # ходьба
+            'walk': [(pg.image.load(f'Animations/Hero/New animation/Walk/R{frame}.png')) for frame in range(1, 4 + 1)],
+            'jump': [pg.image.load(f'Animations/Hero/New animation/Jump/J{frame}.png') for frame in range(1, 2 + 1)],
+            'fall': [pg.image.load('Animations/Hero/New animation/Fall/F.png')],
+            'attack': [pg.image.load(f'Animations/Hero/New animation/Attack/A{frame}.png') for frame in
+                       range(1, 3 + 1)],
+            'count': 0
         }
         self.walk_state = 1  # то, в каком положении сейчас находится гг
         # Переменные для передвижения
@@ -55,6 +65,7 @@ class Hero(pg.sprite.Sprite):
         # https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
         self.rect = self.image.get_rect(x=x, y=y)  # располагаем героя в определенной точке пространства
         self.level = None
+        self.currentAnimation = 'walk'
         # Упирается ли герой во что-то
         self.isCollided = {
             'up': False,
@@ -68,39 +79,44 @@ class Hero(pg.sprite.Sprite):
             'max': 1 * FPS,
             'current': 0
         }  # время бессмертия после урона в кадрах
+
         self.attackProperties = dict(isAttacking=False, attackState=0, attackMaxLength=0.2 * FPS, couldown = 1*FPS)
         self.isAlive=True
 
+
     def update(self, surface: pg.surface.Surface, level=None, events: pg.event.get() = None):
+        print("*"*20)
+
         keys = pg.key.get_pressed()
         self.check_controls(keys, events)  # Проверяем управление
 
+        print ("self.isCollided['down']", self.isCollided['down'])
         # костылим гравитацию
-        if not self.isCollided['down']:
-            self.current_speed['y'] += GRAVITY
+        # if not self.isCollided['down']:
+        self.current_speed['y'] += GRAVITY
 
         self.isCollided['down'] = False  # заново проверяем, стоим ли мы
-        self.rect.y += self.current_speed['y']
+
+        print("round(self.current_speed['y'])  ", self.current_speed['y'], ceil(self.current_speed['y']))
+
+        self.rect.y += ceil(self.current_speed['y'])
         self.checkCollide_y()
+        print ("self.isCollided['down']", self.isCollided['down'])
+
         self.rect.x += self.current_speed['x']
         self.checkCollide_x()
         # Делаем анимацию
         self.animation()
-        # Рисуем все
         self.check_damage()
         self.bullets.update()
         self.bullets.draw(surface)
         self.weapon.update(surface)
+        # Рисуем все
         self.draw(surface)
 
     def draw(self, surface: pg.surface.Surface):  # Отрисовать героя на экране
 
         surface.blit(pg.transform.flip(self.image, bool(self.facing), 0), self.rect)
-
-    def set_frame(self):  # Узнаем, на каком кадре находится анимация
-        frame = int((self.walk_state // 3) % len(self.animations['walk']))  # при каждом передвижении мы немного
-        # увеличиваем переменную self.walkstate
-        self.image = self.animations['walk'][frame]
 
     def check_controls(self, keys, events=None):  # events нужен, так как pygame крайне не любит, когда
         # много раз вызывают pg.event.get(), но ее можно не передавать, если персонаж не должен атаковать
@@ -114,17 +130,17 @@ class Hero(pg.sprite.Sprite):
             self.current_speed['x'] = self.move_speed['x']
         if not keys[pg.K_a] and not keys[pg.K_d]:
             self.current_speed['x'] = 0
-        if keys[pg.K_SPACE] and self.isCollided['down']:
-            self.current_speed['y'] = self.move_speed['y'] * -1
+
         if keys[pg.K_s]:
             self.jumpDown = True
         self.jump(keys, events)
         self.checkAttack(events)
 
     def jump(self, keys, events):
-        if events is not None:
+        if events is not None: # if events != []
             if keys[pg.K_SPACE] and self.isCollided['down']:
                 self.current_speed['y'] = self.move_speed['y'] * -1
+                self.animations['count'] = 0
             for event in events:
                 if event.type == pg.KEYDOWN and event.key == pg.K_s:  # Спрыгнуть вниз c платформы
                     self.jumpDown = True
@@ -151,9 +167,7 @@ class Hero(pg.sprite.Sprite):
             for mob in bulletDamaged.values():
                 if type(mob[0]) is not Enemy.Ghost:
                     mob[0].get_damage(self.bulletDamage)
-        if swordDamaged is not None:
-            for mob in swordDamaged:
-                pass
+                    print(mob[0].health)
 
     def check_damage(self):
         sprite = pg.sprite.spritecollideany(self, self.level.mobs)
@@ -170,12 +184,13 @@ class Hero(pg.sprite.Sprite):
         # Пока мы просто создаем прямоугольник, внутри которого враги получают урон
         # attackField = pg.rect.Rect(self.rect.x + (self.rect.w * self.facing), self.rect.y, 20, self.rect.h)
         if not self.attackProperties['isAttacking']:
-            left = self.rect.x + self.rect.w if self.facing is 1 else self.rect.x - self.rect.w
+            left = self.rect.x + self.rect.w if self.facing is 0 else self.rect.x - self.rect.w
             top = self.rect.y
             width = 30
             height = self.rect.h
             self.weaponRect = pg.rect.Rect(left, top, width, height)
             self.attackProperties['isAttacking'] = True
+            self.animations['count'] = 0
         else:
             self.attackProperties['attackState'] += 1
             if self.attackProperties['attackState'] == self.attackProperties['attackMaxLength']:
@@ -186,13 +201,17 @@ class Hero(pg.sprite.Sprite):
             print(mob)
             if self.weaponRect.colliderect(mobRects[mob]):
                 mob.get_damage(self.swordDamage)
-                print ('hp -', mob.health)
+                print('hp -', mob.health)
 
     def checkCollide_y(self):  # TODO: добавить возможность спрыгнуть с платформы
 
+        print("CollideAny",pg.sprite.spritecollideany(self, self.level.level, collided = None))
+        print(f"rect.y {self.rect.y}, bottom {self.rect.bottom}, speed {self.current_speed['y']}")
+
         for tile in self.level.level:
 
-            if pg.sprite.collide_rect(self, tile):
+            if tile.rect.colliderect(self.rect):
+                print(f"203 строка =={self.rect.bottom}=={tile.rect.top}==={self.current_speed['y']}==========================")
 
                 if self.current_speed['y'] > 0:  # Если падаем
                     if self.rect.bottom < tile.rect.top + 15:  # Если падаем на плитку сверху
@@ -248,15 +267,41 @@ class Hero(pg.sprite.Sprite):
             self.level = level
 
     def animation(self):
-        if self.current_speed['x'] < 0:  # Если идем влево
-            self.facing = 0  # Разворачиваем
-            self.walk_state += 1 / 3
-        elif self.current_speed['x'] > 0:  # Вправо
-            self.facing = 1
-            self.walk_state += 1 / 3
+        print ('\n', self.current_speed['y'])
+        print (self.isCollided['down'])
+        if self.current_speed['y'] != 0 and not self.isCollided['down']:
+            if self.current_speed['y'] < 0:  # Если подлетаем
+                self.currentAnimation = 'jump'
+                self.animations['count'] += self.dframe['jump']
+                print(self.animations['count'])
+            elif self.current_speed['y'] > 0:  # Если падаем
+                self.currentAnimation = 'fall'
         else:
-            self.walk_state = 1
+            if self.current_speed['x'] < 0:  # Если идем влево
+                self.facing = 1  # Разворачиваем
+                self.animations['count'] += self.dframe['walk']
+
+            elif self.current_speed['x'] > 0:  # Вправо
+                self.facing = 0
+                self.animations['count'] += self.dframe['walk']
+
+            if self.current_speed['x'] !=0:
+                self.currentAnimation = 'walk'
+            else:
+                pass
+                ## TODO добавить картинку стояния на месте
+
+        if self.attackProperties['isAttacking']:
+            self.currentAnimation = 'attack'
+            self.animations['count'] += self.dframe['attack']
         self.set_frame()
+        print(self.animations['count'])
+
+    def set_frame(self):  # Узнаем, на каком кадре находится анимация
+        frame = int((self.animations['count'] // 1) % len(self.animations[self.currentAnimation]))
+        print(frame)
+        print(self.currentAnimation)
+        self.image = self.animations[self.currentAnimation][frame]
 
     def heal(self, hp):
         self.hp += hp
@@ -319,7 +364,7 @@ class Bullet(pg.sprite.Sprite):
         self.speed = 10  # скорость по х
 
     def update(self) -> None:
-        self.rect.x += self.speed * (1 if self.direction == 0 else -1)
+        self.rect.x += self.speed * (-1 if self.direction == 0 else 1)
 
 
 class Sword(pg.sprite.Sprite):
