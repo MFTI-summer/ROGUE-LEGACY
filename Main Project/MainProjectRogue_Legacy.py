@@ -25,6 +25,7 @@ if __name__ == '__main__':
     mana_potion = Item.RestoreManaItem(50)
     hero = Hero.Hero(x=400, y=150)
     ui = UI.UI(hero, 5, WIN_height - 5)
+
     for _ in range(10):
         ui.heal_slot.store_item(heal_potion)
         ui.mana_slot.store_item(mana_potion)
@@ -36,6 +37,7 @@ if __name__ == '__main__':
     level = Tiles.Level(Tiles.levels[current_level])
     hero.set_level(level)
     hero.get_damage(30)
+
     while run and hero.isAlive:
         hero.restore_mana(MANA_RESTORED_FOR_TICK / fps)
         events = pg.event.get()
@@ -70,6 +72,7 @@ if __name__ == '__main__':
                     ui.heal_slot.use_item()
                 if event.key == pg.K_a or event.key == pg.K_d:
                     hero.walk_or_collide.play()
+
         hero.sounds()
         ui.update()
         ui.display(display)
